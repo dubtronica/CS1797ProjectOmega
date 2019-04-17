@@ -134,10 +134,18 @@
     <None Include="skybox.fsh" />
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="frame.vsh" />
-    <FxCompile Include="reflect.vsh" />
-    <FxCompile Include="refract.vsh" />
-    <FxCompile Include="skybox.vsh" />
+    <None Include="frame.vsh">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="reflect.vsh">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="refract.vsh">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="skybox.vsh">
+      <FileType>Document</FileType>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="glad.c" />

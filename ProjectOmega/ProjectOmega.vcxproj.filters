@@ -30,20 +30,18 @@
     <None Include="skybox.fsh">
       <Filter>Source Files</Filter>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <FxCompile Include="frame.vsh">
+    <None Include="frame.vsh">
       <Filter>Source Files</Filter>
-    </FxCompile>
-    <FxCompile Include="reflect.vsh">
+    </None>
+    <None Include="reflect.vsh">
       <Filter>Source Files</Filter>
-    </FxCompile>
-    <FxCompile Include="refract.vsh">
+    </None>
+    <None Include="refract.vsh">
       <Filter>Source Files</Filter>
-    </FxCompile>
-    <FxCompile Include="skybox.vsh">
+    </None>
+    <None Include="skybox.vsh">
       <Filter>Source Files</Filter>
-    </FxCompile>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="glad.c">
