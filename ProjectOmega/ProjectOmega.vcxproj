@@ -74,8 +74,8 @@
     <LibraryPath>C:\Users\user\source\repos\OpenGL programs %28CS 179.7%29\libraries;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>C:\Users\user\source\repos\OpenGL Required Folders %28x64%29\includes%2864b%29;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\user\source\repos\OpenGL Required Folders %28x64%29\libraries%2864b%29;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir)OpenGL\Include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(LibraryPath);$(ProjectDir)OpenGL\Libs</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
