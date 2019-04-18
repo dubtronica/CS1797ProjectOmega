@@ -73,6 +73,10 @@
     <IncludePath>C:\Users\user\source\repos\OpenGL programs %28CS 179.7%29\includes;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Users\user\source\repos\OpenGL programs %28CS 179.7%29\libraries;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <IncludePath>C:\Users\user\source\repos\OpenGL Required Folders %28x64%29\includes%2864b%29;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\user\source\repos\OpenGL Required Folders %28x64%29\libraries%2864b%29;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -94,6 +98,7 @@
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
+      <AdditionalDependencies>opengl32.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
