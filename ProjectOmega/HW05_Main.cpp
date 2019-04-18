@@ -94,7 +94,7 @@ Vertexture full_screens[] = {
 	{1, -1, 0, 1, 0}
 };
 
-vector<string> faces = { "px.jpg", "nx.jpg", "py.jpg", "ny.jpg", "pz.jpg", "nz.jpg" };
+vector<string> faces = { "textures/px.jpg", "textures/nx.jpg", "textures/py.jpg", "textures/ny.jpg", "textures/pz.jpg", "textures/nz.jpg" };
 
 GLuint loadCubemap(vector<string> f) {
 	GLuint texID;
@@ -324,14 +324,14 @@ int main() {
 	GLuint sbox = loadCubemap(faces);
 	
 	//SB program
-	auto skyboxprogram = loadProgram("skybox.vsh", "skybox.fsh");
+	auto skyboxprogram = loadProgram("shaders/skybox.vsh", "shaders/skybox.fsh");
 	auto s_cube = glGetUniformLocation(skyboxprogram, "skybox");
 	auto s_view = glGetUniformLocation(skyboxprogram, "view");
 	auto s_proj = glGetUniformLocation(skyboxprogram, "projection");
 
 	//render programs
-	GLuint sphereprogram = loadProgram("reflect.vsh", "reflect.fsh");
-	GLuint sphereprogram2 = loadProgram("refract.vsh", "refract.fsh");
+	GLuint sphereprogram = loadProgram("shaders/reflect.vsh", "shaders/reflect.fsh");
+	GLuint sphereprogram2 = loadProgram("shaders/refract.vsh", "shaders/refract.fsh");
 
 	GLuint u_cube, u_model, u_view, u_proj, u_eyepos, u_cube2, u_model2, u_view2, u_proj2, u_eyepos2;
 	{
@@ -349,14 +349,14 @@ int main() {
 	}
 
 	//blur program
-	GLuint frameprogram = loadProgram("frame.vsh", "frame.fsh");
+	GLuint frameprogram = loadProgram("shaders/frame.vsh", "shaders/frame.fsh");
 	auto f_frametex = glGetUniformLocation(frameprogram, "frametex"); //source texture for blurring
 	
 	glUseProgram(frameprogram);
 	glUniform1i(f_frametex, 3);
 
 	//combine program
-	GLuint combineprogram = loadProgram("frame.vsh", "combine.fsh");
+	GLuint combineprogram = loadProgram("shaders/frame.vsh", "shaders/combine.fsh");
 	GLuint c_pristineTex, c_blurTex, c_depthTex, c_focus, c_selection;
 	{
 		c_pristineTex = glGetUniformLocation(combineprogram, "pristineTex");
@@ -537,9 +537,6 @@ int main() {
 			glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 		}
 
-		//hi jasmine
-		//this is fun aujdhdafffewc ewcgfcftr
-		// hello
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 
