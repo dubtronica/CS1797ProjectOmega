@@ -51,9 +51,4 @@
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
-  <ItemGroup>
-    <Image Include="n.jpg">
-      <Filter>Source Files</Filter>
-    </Image>
-  </ItemGroup>
 </Project>
