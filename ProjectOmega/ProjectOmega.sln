@@ -18,6 +18,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "shaders", "shaders", "{DE0B
 		shaders\skybox.vsh = shaders\skybox.vsh
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{DFCADB39-E08E-4948-A939-B09E85DC3982}"
+	ProjectSection(SolutionItems) = preProject
+		OpenGL\Include\glutil.h = OpenGL\Include\glutil.h
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64

@@ -191,14 +191,13 @@ int main() {
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 	}
 
-	GLuint spherevao, spherevbo;
+	GLuint sphereVAO, sphereVBO;
 	auto sphere = genSphere(0.1125f, 50);
 	{
-		glGenVertexArrays(1, &spherevao);
-		glBindVertexArray(spherevao);
-		glGenBuffers(1, &spherevbo);
-		glBindBuffer(GL_ARRAY_BUFFER, spherevbo);
-		glBindVertexArray(spherevao);
+		glGenVertexArrays(1, &sphereVAO);
+		glGenBuffers(1, &sphereVBO);
+		glBindVertexArray(sphereVAO);
+		glBindBuffer(GL_ARRAY_BUFFER, sphereVBO);
 
 		glBufferData(GL_ARRAY_BUFFER, sphere.size() * sizeof(Vertex), sphere.data(), GL_STATIC_DRAW);
 		glEnableVertexAttribArray(0);
@@ -207,14 +206,14 @@ int main() {
 		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, x1));
 	}
 
-	GLuint cubevao, cubevbo;
+	GLuint cubeVAO, cubeVBO;
 	auto cube = genCube(0.1125f, 50);
 	{
-		glGenVertexArrays(1, &cubevao);
-		glBindVertexArray(cubevao);
-		glGenBuffers(1, &cubevbo);
-		glBindBuffer(GL_ARRAY_BUFFER, cubevbo);
-		glBindVertexArray(cubevao);
+		glGenVertexArrays(1, &cubeVAO);
+		glBindVertexArray(cubeVAO);
+		glGenBuffers(1, &cubeVBO);
+		glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
+		glBindVertexArray(cubeVAO);
 
 		glBufferData(GL_ARRAY_BUFFER, cube.size() * sizeof(Vertex), cube.data(), GL_STATIC_DRAW);
 		glEnableVertexAttribArray(0);
@@ -223,13 +222,13 @@ int main() {
 		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, x1));
 	}
 
-	GLuint vao, vbo;
+	GLuint screenVAO, screenVBO;
 	{
-		glGenVertexArrays(1, &vao);
-		glBindVertexArray(vao);
-		glGenBuffers(1, &vbo);
-		glBindBuffer(GL_ARRAY_BUFFER, vbo);
-		glBindVertexArray(vao);
+		glGenVertexArrays(1, &screenVAO);
+		glBindVertexArray(screenVAO);
+		glGenBuffers(1, &screenVBO);
+		glBindBuffer(GL_ARRAY_BUFFER, screenVBO);
+		glBindVertexArray(screenVAO);
 
 		glBufferData(GL_ARRAY_BUFFER, sizeof(full_screens), full_screens, GL_STATIC_DRAW);
 		glEnableVertexAttribArray(0);
@@ -373,7 +372,6 @@ int main() {
 	glUniform1i(c_blurTex, 4);
 	glUniform1i(c_depthTex, 5);
 	
-
 	/// render loop
 	while (!glfwWindowShouldClose(window)) {
 		processInput(window);
@@ -403,7 +401,7 @@ int main() {
 
 				glActiveTexture(GL_TEXTURE0);
 				glBindTexture(GL_TEXTURE_CUBE_MAP, sbox);
-				glBindVertexArray(spherevao);
+				glBindVertexArray(sphereVAO);
 				glDrawArrays(GL_TRIANGLE_STRIP, 0, sphere.size());
 			}
 
@@ -420,7 +418,7 @@ int main() {
 
 				glActiveTexture(GL_TEXTURE0);
 				glBindTexture(GL_TEXTURE_CUBE_MAP, sbox);
-				glBindVertexArray(spherevao);
+				glBindVertexArray(sphereVAO);
 				glDrawArrays(GL_TRIANGLE_STRIP, 0, sphere.size());
 			}
 
@@ -437,7 +435,7 @@ int main() {
 
 				glActiveTexture(GL_TEXTURE0);
 				glBindTexture(GL_TEXTURE_CUBE_MAP, sbox);
-				glBindVertexArray(spherevao);
+				glBindVertexArray(sphereVAO);
 				glDrawArrays(GL_TRIANGLE_STRIP, 0, sphere.size());
 			}
 
@@ -454,7 +452,7 @@ int main() {
 
 				glActiveTexture(GL_TEXTURE0);
 				glBindTexture(GL_TEXTURE_CUBE_MAP, sbox);
-				glBindVertexArray(cubevao);
+				glBindVertexArray(cubeVAO);
 				glDrawArrays(GL_TRIANGLE_STRIP, 0, cube.size());
 			}
 
@@ -471,7 +469,7 @@ int main() {
 
 				glActiveTexture(GL_TEXTURE0);
 				glBindTexture(GL_TEXTURE_CUBE_MAP, sbox);
-				glBindVertexArray(cubevao);
+				glBindVertexArray(cubeVAO);
 				glDrawArrays(GL_TRIANGLE_STRIP, 0, cube.size());
 			}
 
@@ -500,10 +498,10 @@ int main() {
 			glBindTexture(GL_TEXTURE_2D, pristineTex);
 
 			glDisable(GL_DEPTH_TEST);
-			glBindVertexArray(vao);
+			glBindVertexArray(screenVAO);
 
 			glUseProgram(frameprogram);
-			glBindVertexArray(vao);
+			glBindVertexArray(screenVAO);
 
 			glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
@@ -529,7 +527,7 @@ int main() {
 
 			glClear(GL_COLOR_BUFFER_BIT);
 
-			glBindVertexArray(vao);
+			glBindVertexArray(screenVAO);
 			glUseProgram(combineprogram);
 			glUniform1i(c_selection, selection);
 			glUniform1f(c_focus, sin(0.75 * glfwGetTime()) + 0.5);
