@@ -7,6 +7,7 @@ in vec3 o_normals;
 
 uniform vec3 eye_pos;
 uniform samplerCube skybox;
+uniform sampler2D dudv;
 
 void main(){
 	vec3 incidence = normalize(o_pos - eye_pos);

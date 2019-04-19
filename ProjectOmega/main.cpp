@@ -337,6 +337,10 @@ int main() {
 
 	//skybox
 	GLuint sbox = loadCubemap(faces);
+
+	GLuint dudvmap;
+	loadTexture(&dudvmap, 6, "textures/dudv.jpg");
+
 	
 	//SB program
 	auto skyboxprogram = loadProgram("shaders/skybox.vsh", "shaders/skybox.fsh");
@@ -346,21 +350,15 @@ int main() {
 
 	//render programs
 	GLuint sphereprogram = loadProgram("shaders/reflect.vsh", "shaders/reflect.fsh");
-	GLuint sphereprogram2 = loadProgram("shaders/refract.vsh", "shaders/refract.fsh");
 
-	GLuint u_cube, u_model, u_view, u_proj, u_eyepos, u_cube2, u_model2, u_view2, u_proj2, u_eyepos2;
+	GLuint u_cube, u_model, u_view, u_proj, u_eyepos, u_dudv;
 	{
 		u_cube = glGetUniformLocation(sphereprogram, "skybox");
 		u_model = glGetUniformLocation(sphereprogram, "model");
 		u_view = glGetUniformLocation(sphereprogram, "view");
 		u_proj = glGetUniformLocation(sphereprogram, "projection");
 		u_eyepos = glGetUniformLocation(sphereprogram, "eye_pos");
-
-		u_cube2 = glGetUniformLocation(sphereprogram2, "skybox");
-		u_model2 = glGetUniformLocation(sphereprogram2, "model");
-		u_view2 = glGetUniformLocation(sphereprogram2, "view");
-		u_proj2 = glGetUniformLocation(sphereprogram2, "projection");
-		u_eyepos2 = glGetUniformLocation(sphereprogram2, "eye_pos");
+		u_dudv = glGetUniformLocation(sphereprogram, "dudv");
 	}
 
 	//blur program
