@@ -442,7 +442,7 @@ int main() {
 				glActiveTexture(GL_TEXTURE0);
 				glBindTexture(GL_TEXTURE_CUBE_MAP, sbox);
 				glBindVertexArray(sphereVAO);
-				//glDrawArrays(GL_TRIANGLE_STRIP, 0, sphere.size());
+				glDrawArrays(GL_TRIANGLE_STRIP, 0, sphere.size());
 			}
 
 			// first cube
