@@ -207,7 +207,7 @@ int main() {
 	}
 
 	GLuint cubeVAO, cubeVBO;
-	auto cube = genCube(0.1125f, 50);
+	auto cube = genCube(0.25f, 50);
 	{
 		glGenVertexArrays(1, &cubeVAO);
 		glBindVertexArray(cubeVAO);
@@ -216,6 +216,22 @@ int main() {
 		glBindVertexArray(cubeVAO);
 
 		glBufferData(GL_ARRAY_BUFFER, cube.size() * sizeof(Vertex), cube.data(), GL_STATIC_DRAW);
+		glEnableVertexAttribArray(0);
+		glEnableVertexAttribArray(1);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, x1));
+	}
+
+	GLuint planeVAO, planeVBO;
+	auto plane = genPlane(glm::vec3(.2, .4, .3), glm::vec3(.3, .4, .2), glm::vec3(0, -.5, 0), 100);
+	{
+		glGenVertexArrays(1, &planeVAO);
+		glBindVertexArray(planeVAO);
+		glGenBuffers(1, &planeVBO);
+		glBindBuffer(GL_ARRAY_BUFFER, planeVBO);
+		glBindVertexArray(planeVAO);
+
+		glBufferData(GL_ARRAY_BUFFER, plane.size() * sizeof(Vertex), plane.data(), GL_STATIC_DRAW);
 		glEnableVertexAttribArray(0);
 		glEnableVertexAttribArray(1);
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
@@ -401,78 +417,9 @@ int main() {
 
 				glActiveTexture(GL_TEXTURE0);
 				glBindTexture(GL_TEXTURE_CUBE_MAP, sbox);
-				glBindVertexArray(sphereVAO);
-				glDrawArrays(GL_TRIANGLE_STRIP, 0, sphere.size());
-			}
-
-			//second sphere
-			{
-				glm::mat4 model2 = glm::mat4(1.f);
-				model2 = glm::translate(model2, glm::vec3(0.f, 0.2f, 0.f));
-				model2 = glm::scale(model2, glm::vec3(0.5f, 0.5f, 0.5f));
-				glUseProgram(sphereprogram2);
-				glUniformMatrix4fv(u_model2, 1, GL_FALSE, glm::value_ptr(model2));
-				glUniformMatrix4fv(u_view2, 1, GL_FALSE, glm::value_ptr(view));
-				glUniformMatrix4fv(u_proj2, 1, GL_FALSE, glm::value_ptr(proj));
-				glUniform3fv(u_eyepos2, 1, (GLfloat*)&cameraPos);
-
-				glActiveTexture(GL_TEXTURE0);
-				glBindTexture(GL_TEXTURE_CUBE_MAP, sbox);
-				glBindVertexArray(sphereVAO);
-				glDrawArrays(GL_TRIANGLE_STRIP, 0, sphere.size());
-			}
-
-			//third sphere
-			{
-				glm::mat4 model3 = glm::mat4(1.f);
-				model3 = glm::translate(model3, glm::vec3(0.f, -0.2f, 0.f));
-				model3 = glm::scale(model3, glm::vec3(0.5f, 0.5f, 0.5f));
-				glUseProgram(sphereprogram2);
-				glUniformMatrix4fv(u_model2, 1, GL_FALSE, glm::value_ptr(model3));
-				glUniformMatrix4fv(u_view2, 1, GL_FALSE, glm::value_ptr(view));
-				glUniformMatrix4fv(u_proj2, 1, GL_FALSE, glm::value_ptr(proj));
-				glUniform3fv(u_eyepos2, 1, (GLfloat*)&cameraPos);
-
-				glActiveTexture(GL_TEXTURE0);
-				glBindTexture(GL_TEXTURE_CUBE_MAP, sbox);
-				glBindVertexArray(sphereVAO);
-				glDrawArrays(GL_TRIANGLE_STRIP, 0, sphere.size());
-			}
-
-			//first cube
-			{
-				glm::mat4 model4 = glm::mat4(1.f);
-				model4 = glm::translate(model4, glm::vec3(-0.2f, 0.f, 0.f));
-				model4 = glm::scale(model4, glm::vec3(0.5f, 0.5f, 0.5f));
-				glUseProgram(sphereprogram);
-				glUniformMatrix4fv(u_model2, 1, GL_FALSE, glm::value_ptr(model4));
-				glUniformMatrix4fv(u_view2, 1, GL_FALSE, glm::value_ptr(view));
-				glUniformMatrix4fv(u_proj2, 1, GL_FALSE, glm::value_ptr(proj));
-				glUniform3fv(u_eyepos2, 1, (GLfloat*)&cameraPos);
-
-				glActiveTexture(GL_TEXTURE0);
-				glBindTexture(GL_TEXTURE_CUBE_MAP, sbox);
 				glBindVertexArray(cubeVAO);
 				glDrawArrays(GL_TRIANGLE_STRIP, 0, cube.size());
 			}
-
-			//second cube
-			{
-				glm::mat4 model5 = glm::mat4(1.f);
-				model5 = glm::translate(model5, glm::vec3(0.2f, 0.f, 0.f));
-				model5 = glm::scale(model5, glm::vec3(0.5f, 0.5f, 0.5f));
-				glUseProgram(sphereprogram);
-				glUniformMatrix4fv(u_model2, 1, GL_FALSE, glm::value_ptr(model5));
-				glUniformMatrix4fv(u_view2, 1, GL_FALSE, glm::value_ptr(view));
-				glUniformMatrix4fv(u_proj2, 1, GL_FALSE, glm::value_ptr(proj));
-				glUniform3fv(u_eyepos2, 1, (GLfloat*)&cameraPos);
-
-				glActiveTexture(GL_TEXTURE0);
-				glBindTexture(GL_TEXTURE_CUBE_MAP, sbox);
-				glBindVertexArray(cubeVAO);
-				glDrawArrays(GL_TRIANGLE_STRIP, 0, cube.size());
-			}
-
 
 			//skybox
 			{
