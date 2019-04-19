@@ -23,6 +23,13 @@ struct Vertex {
 		x1, y1, z1; // normal
 };
 
+struct NewVertex {
+	GLfloat
+		x, y, z, // position
+		x1, y1, z1, // normal
+		u, v; // texture
+};
+
 inline void checkForErrors(unsigned int shader, std::string type);
 
 inline GLuint loadProgram(const GLchar* vsh, const GLchar* fsh) {
@@ -375,4 +382,91 @@ Matrix4 scale(Matrix4 mat, GLfloat x, GLfloat y, GLfloat z) {
 	result.set(2, 2, z);
 	return multiply(mat, result);
 }
+
+//================================== with texture ========================================
+inline std::vector<NewVertex> genTexPlane(glm::vec3 u, glm::vec3 v, const glm::vec3& start, const GLuint resolution) {
+	/*
+	 Generates a plane
+	 u -> one side of the plane
+	 v -> the other side of the plane
+	 Size of the plane depends on the magnitude of u and v
+	 start -> lower left corner of the plane
+	 resolution -> how many points are in the plane (resolution of 1 generates 4 points, resolution of 2 generates 9 vertices, 3 -> 12, etc
+	 */
+	u /= resolution; v /= resolution;
+	std::vector<NewVertex> mesh;
+	glm::vec3 normal = glm::normalize(glm::cross(u, v));
+
+	for (GLuint row = 0; row < resolution; ++row) {
+		if (row != 0) {
+			glm::vec3 p = v * (row + 1.f) + start;
+			mesh.push_back(NewVertex{ p.x, p.y, p.z, normal.x, normal.y, normal.z, 0.f , float(row + 1) / resolution });
+		}
+		for (GLuint col = 0; col < resolution; ++col) {
+			glm::vec3 p = u * float(col) + v * (row + 1.f) + start;
+			mesh.push_back(NewVertex{ p.x, p.y, p.z, normal.x, normal.y, normal.z, float(col) / resolution , float(row + 1) / resolution });
+
+			glm::vec3 p1 = u * float(col) + v * float(row) + start;
+			mesh.push_back(NewVertex{ p1.x, p1.y, p1.z, normal.x, normal.y, normal.z, float(col) / resolution , float(row) / resolution });
+		}
+		glm::vec3 p = u * float(resolution) + v * (row + 1.f) + start;
+		mesh.push_back(NewVertex{ p.x, p.y, p.z, normal.x, normal.y, normal.z, 1.f, float(row + 1) / resolution });
+		glm::vec3 p1 = u * float(resolution) + v * float(row) + start;
+		mesh.push_back(NewVertex{ p1.x, p1.y, p1.z, normal.x, normal.y, normal.z, 1.f , float(row) / resolution });
+
+		if (row + 1 != resolution) {
+			mesh.push_back(mesh.back());
+		}
+	}
+
+	return mesh;
+}
+
+inline std::vector<NewVertex> genTexCube(const GLfloat size, const unsigned int resolution, const glm::vec3& offset = glm::vec3(0)) {
+	/*
+	 Uses genPlane 6 times to make a cube
+	 size -> length of a side
+	 resolution -> how many points are generated
+	 offset -> position upon initialization (center)
+	 */
+	std::vector<NewVertex> mesh;
+	glm::vec3 u, v, o;
+	for (GLuint side = 0; side < 6; ++side) {
+		switch (side >> 1) {
+		case 0:
+			o = glm::vec3(size * 0.5, 0, 0);
+			u = glm::vec3(0, 0, -size);
+			v = glm::vec3(0, size, 0);
+			break;
+		case 1:
+			o = glm::vec3(0, size * 0.5, 0);
+			u = glm::vec3(size, 0, 0);
+			v = glm::vec3(0, 0, -size);
+			break;
+		case 2:
+			o = glm::vec3(0, 0, size * 0.5);
+			u = glm::vec3(size, 0, 0);
+			v = glm::vec3(0, size, 0);
+			break;
+		default:
+			assert(false && "Should never happen.");
+		}
+
+		if (side % 2 == 1) {
+			o *= -1;
+			u *= -1;
+		}
+		o -= (u + v) / 2.f;
+
+		const auto& p = genTexPlane(u, v, o + offset, resolution);
+		if (!mesh.empty()) {
+			mesh.push_back(mesh.back());
+			mesh.push_back(p.front());
+		}
+		mesh.insert(mesh.end(), p.begin(), p.end());
+	}
+
+	return mesh;
+}
+
 #endif

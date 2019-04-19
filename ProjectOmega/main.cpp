@@ -222,6 +222,22 @@ int main() {
 		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, x1));
 	}
 
+	GLuint cubeTexVAO, cubeTexVBO;
+	auto texcube = genTexCube(0.5f, 1);
+	{
+		glGenVertexArrays(1, &cubeTexVAO);
+		glBindVertexArray(cubeTexVAO);
+		glGenBuffers(1, &cubeTexVBO);
+		glBindBuffer(GL_ARRAY_BUFFER, cubeTexVBO);
+		glBindVertexArray(cubeTexVAO);
+
+		glBufferData(GL_ARRAY_BUFFER, texcube.size() * sizeof(NewVertex), texcube.data(), GL_STATIC_DRAW);
+		glEnableVertexAttribArray(0);
+		glEnableVertexAttribArray(1);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(NewVertex), 0);
+		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(NewVertex), (void*)offsetof(NewVertex, u));
+	}
+
 	GLuint planeVAO, planeVBO;
 	auto plane = genPlane(glm::vec3(.2, .4, .3), glm::vec3(.3, .4, .2), glm::vec3(0, -.5, 0), 100);
 	{
@@ -341,6 +357,8 @@ int main() {
 	GLuint dudvmap;
 	loadTexture(&dudvmap, 6, "textures/dudv.jpg");
 
+	GLuint pooltex;
+	loadTexture(&pooltex, 7, "textures/bathroom_tiles.jpg");
 	
 	//SB program
 	auto skyboxprogram = loadProgram("shaders/skybox.vsh", "shaders/skybox.fsh");
@@ -381,6 +399,14 @@ int main() {
 
 	glUseProgram(combineprogram);
 
+	GLuint poolprogram = loadProgram("shaders/plain.vsh", "shaders/plain.fsh");
+	GLuint p_model, p_view, p_proj;
+	{
+		p_model = glGetUniformLocation(poolprogram, "model");
+		p_view = glGetUniformLocation(poolprogram, "view");
+		p_proj = glGetUniformLocation(poolprogram, "projection");
+	}
+
 	// set up Uniform1i's
 	glUniform1i(c_pristineTex, 3);
 	glUniform1i(c_blurTex, 4);
@@ -390,12 +416,12 @@ int main() {
 	while (!glfwWindowShouldClose(window)) {
 		processInput(window);
 
-		std::cout << selection << std::endl;
+		//std::cout << selection << std::endl;
 
 		//bind pristineFbo and render
 		{
 			glBindFramebuffer(GL_FRAMEBUFFER, pristineFbo);
-			glClearColor(0.f, 0.f, 0.f, 1.0f);
+			glClearColor(0.1f, 0.3f, 0.5f, 1.0f);
 			glEnable(GL_DEPTH_TEST);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -416,7 +442,23 @@ int main() {
 				glActiveTexture(GL_TEXTURE0);
 				glBindTexture(GL_TEXTURE_CUBE_MAP, sbox);
 				glBindVertexArray(sphereVAO);
-				glDrawArrays(GL_TRIANGLE_STRIP, 0, sphere.size());
+				//glDrawArrays(GL_TRIANGLE_STRIP, 0, sphere.size());
+			}
+
+			// first cube
+			{
+				glFrontFace(GL_CW);
+				glm::mat4 model = glm::mat4(1.f);
+				glUseProgram(poolprogram);
+				glUniformMatrix4fv(p_model, 1, GL_FALSE, glm::value_ptr(model));
+				glUniformMatrix4fv(p_view, 1, GL_FALSE, glm::value_ptr(view));
+				glUniformMatrix4fv(p_proj, 1, GL_FALSE, glm::value_ptr(proj));
+
+				glActiveTexture(GL_TEXTURE0);
+				glBindTexture(GL_TEXTURE_2D, pooltex);
+				glBindVertexArray(cubeTexVAO);
+				glDrawArrays(GL_TRIANGLE_STRIP, 0, texcube.size());
+				glFrontFace(GL_CCW);
 			}
 
 			//skybox
