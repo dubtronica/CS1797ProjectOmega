@@ -33,10 +33,10 @@ mouse_lastY = SCR_HEIGHT / 2.f,		// to keep track of mouse position
 yaw = -90.f,						// camera yaw 
 pitch = 0;	// camera pitch
 
+int selection = 1;
+
 bool
 firstMouse = true, refMode = true;			// fixing the mouse location upon startup (check camera slides)                    // input management (so the key is not repeated until released)
-
-int selection = 1;
 
 float skybox[] = {
 	// positions          
@@ -94,7 +94,7 @@ Vertexture full_screens[] = {
 	{1, -1, 0, 1, 0}
 };
 
-vector<string> faces = { "px.jpg", "nx.jpg", "py.jpg", "ny.jpg", "pz.jpg", "nz.jpg" };
+vector<string> faces = { "textures/px.jpg", "textures/nx.jpg", "textures/py.jpg", "textures/ny.jpg", "textures/pz.jpg", "textures/nz.jpg" };
 
 GLuint loadCubemap(vector<string> f) {
 	GLuint texID;
@@ -191,14 +191,13 @@ int main() {
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 	}
 
-	GLuint spherevao, spherevbo;
+	GLuint sphereVAO, sphereVBO;
 	auto sphere = genSphere(0.1125f, 50);
 	{
-		glGenVertexArrays(1, &spherevao);
-		glBindVertexArray(spherevao);
-		glGenBuffers(1, &spherevbo);
-		glBindBuffer(GL_ARRAY_BUFFER, spherevbo);
-		glBindVertexArray(spherevao);
+		glGenVertexArrays(1, &sphereVAO);
+		glGenBuffers(1, &sphereVBO);
+		glBindVertexArray(sphereVAO);
+		glBindBuffer(GL_ARRAY_BUFFER, sphereVBO);
 
 		glBufferData(GL_ARRAY_BUFFER, sphere.size() * sizeof(Vertex), sphere.data(), GL_STATIC_DRAW);
 		glEnableVertexAttribArray(0);
@@ -207,14 +206,14 @@ int main() {
 		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, x1));
 	}
 
-	GLuint cubevao, cubevbo;
+	GLuint cubeVAO, cubeVBO;
 	auto cube = genCube(0.1125f, 50);
 	{
-		glGenVertexArrays(1, &cubevao);
-		glBindVertexArray(cubevao);
-		glGenBuffers(1, &cubevbo);
-		glBindBuffer(GL_ARRAY_BUFFER, cubevbo);
-		glBindVertexArray(cubevao);
+		glGenVertexArrays(1, &cubeVAO);
+		glBindVertexArray(cubeVAO);
+		glGenBuffers(1, &cubeVBO);
+		glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
+		glBindVertexArray(cubeVAO);
 
 		glBufferData(GL_ARRAY_BUFFER, cube.size() * sizeof(Vertex), cube.data(), GL_STATIC_DRAW);
 		glEnableVertexAttribArray(0);
@@ -223,13 +222,13 @@ int main() {
 		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, x1));
 	}
 
-	GLuint vao, vbo;
+	GLuint screenVAO, screenVBO;
 	{
-		glGenVertexArrays(1, &vao);
-		glBindVertexArray(vao);
-		glGenBuffers(1, &vbo);
-		glBindBuffer(GL_ARRAY_BUFFER, vbo);
-		glBindVertexArray(vao);
+		glGenVertexArrays(1, &screenVAO);
+		glBindVertexArray(screenVAO);
+		glGenBuffers(1, &screenVBO);
+		glBindBuffer(GL_ARRAY_BUFFER, screenVBO);
+		glBindVertexArray(screenVAO);
 
 		glBufferData(GL_ARRAY_BUFFER, sizeof(full_screens), full_screens, GL_STATIC_DRAW);
 		glEnableVertexAttribArray(0);
@@ -324,14 +323,14 @@ int main() {
 	GLuint sbox = loadCubemap(faces);
 	
 	//SB program
-	auto skyboxprogram = loadProgram("skybox.vsh", "skybox.fsh");
+	auto skyboxprogram = loadProgram("shaders/skybox.vsh", "shaders/skybox.fsh");
 	auto s_cube = glGetUniformLocation(skyboxprogram, "skybox");
 	auto s_view = glGetUniformLocation(skyboxprogram, "view");
 	auto s_proj = glGetUniformLocation(skyboxprogram, "projection");
 
 	//render programs
-	GLuint sphereprogram = loadProgram("reflect.vsh", "reflect.fsh");
-	GLuint sphereprogram2 = loadProgram("refract.vsh", "refract.fsh");
+	GLuint sphereprogram = loadProgram("shaders/reflect.vsh", "shaders/reflect.fsh");
+	GLuint sphereprogram2 = loadProgram("shaders/refract.vsh", "shaders/refract.fsh");
 
 	GLuint u_cube, u_model, u_view, u_proj, u_eyepos, u_cube2, u_model2, u_view2, u_proj2, u_eyepos2;
 	{
@@ -349,14 +348,14 @@ int main() {
 	}
 
 	//blur program
-	GLuint frameprogram = loadProgram("frame.vsh", "frame.fsh");
+	GLuint frameprogram = loadProgram("shaders/frame.vsh", "shaders/frame.fsh");
 	auto f_frametex = glGetUniformLocation(frameprogram, "frametex"); //source texture for blurring
 	
 	glUseProgram(frameprogram);
 	glUniform1i(f_frametex, 3);
 
 	//combine program
-	GLuint combineprogram = loadProgram("frame.vsh", "combine.fsh");
+	GLuint combineprogram = loadProgram("shaders/frame.vsh", "shaders/combine.fsh");
 	GLuint c_pristineTex, c_blurTex, c_depthTex, c_focus, c_selection;
 	{
 		c_pristineTex = glGetUniformLocation(combineprogram, "pristineTex");
@@ -372,10 +371,12 @@ int main() {
 	glUniform1i(c_pristineTex, 3);
 	glUniform1i(c_blurTex, 4);
 	glUniform1i(c_depthTex, 5);
-
+	
 	/// render loop
 	while (!glfwWindowShouldClose(window)) {
 		processInput(window);
+
+		std::cout << selection << std::endl;
 
 		//bind pristineFbo and render
 		{
@@ -400,7 +401,7 @@ int main() {
 
 				glActiveTexture(GL_TEXTURE0);
 				glBindTexture(GL_TEXTURE_CUBE_MAP, sbox);
-				glBindVertexArray(spherevao);
+				glBindVertexArray(sphereVAO);
 				glDrawArrays(GL_TRIANGLE_STRIP, 0, sphere.size());
 			}
 
@@ -417,7 +418,7 @@ int main() {
 
 				glActiveTexture(GL_TEXTURE0);
 				glBindTexture(GL_TEXTURE_CUBE_MAP, sbox);
-				glBindVertexArray(spherevao);
+				glBindVertexArray(sphereVAO);
 				glDrawArrays(GL_TRIANGLE_STRIP, 0, sphere.size());
 			}
 
@@ -434,7 +435,7 @@ int main() {
 
 				glActiveTexture(GL_TEXTURE0);
 				glBindTexture(GL_TEXTURE_CUBE_MAP, sbox);
-				glBindVertexArray(spherevao);
+				glBindVertexArray(sphereVAO);
 				glDrawArrays(GL_TRIANGLE_STRIP, 0, sphere.size());
 			}
 
@@ -451,7 +452,7 @@ int main() {
 
 				glActiveTexture(GL_TEXTURE0);
 				glBindTexture(GL_TEXTURE_CUBE_MAP, sbox);
-				glBindVertexArray(cubevao);
+				glBindVertexArray(cubeVAO);
 				glDrawArrays(GL_TRIANGLE_STRIP, 0, cube.size());
 			}
 
@@ -468,7 +469,7 @@ int main() {
 
 				glActiveTexture(GL_TEXTURE0);
 				glBindTexture(GL_TEXTURE_CUBE_MAP, sbox);
-				glBindVertexArray(cubevao);
+				glBindVertexArray(cubeVAO);
 				glDrawArrays(GL_TRIANGLE_STRIP, 0, cube.size());
 			}
 
@@ -497,10 +498,10 @@ int main() {
 			glBindTexture(GL_TEXTURE_2D, pristineTex);
 
 			glDisable(GL_DEPTH_TEST);
-			glBindVertexArray(vao);
+			glBindVertexArray(screenVAO);
 
 			glUseProgram(frameprogram);
-			glBindVertexArray(vao);
+			glBindVertexArray(screenVAO);
 
 			glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
@@ -526,14 +527,13 @@ int main() {
 
 			glClear(GL_COLOR_BUFFER_BIT);
 
-			glBindVertexArray(vao);
+			glBindVertexArray(screenVAO);
 			glUseProgram(combineprogram);
 			glUniform1i(c_selection, selection);
 			glUniform1f(c_focus, sin(0.75 * glfwGetTime()) + 0.5);
 
 			glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 		}
-
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
@@ -551,16 +551,16 @@ int main() {
 }
 // process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
 void processInput(GLFWwindow *window) {
-	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-		glfwSetWindowShouldClose(window, true);	
 	if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
-		selection = 1;
+		selection = 1; //just added this for selecting through stuff, go check out combine.fsh
 	if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
 		selection = 2;
 	if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS)
 		selection = 3;
 	if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS)
 		selection = 4;
+	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+		exit(0);
 }
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
