@@ -20,6 +20,6 @@ void main(){
 	vec4 reflectcolor = vec4(texture(skybox, reflection).rgb, 1.0);
 	vec4 refractcolor = vec4(texture(skybox, refraction).rgb, 1.0);
 		
-	color = mix(reflectcolor, refractcolor, fresnel);
+	color = mix(mix(reflectcolor, refractcolor, fresnel), vec4(0.0, 0.5, 0.5, 1.0), 0.6);
 	
 }
