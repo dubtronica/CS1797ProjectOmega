@@ -239,7 +239,6 @@ inline void loadTexture(GLuint* tex, GLuint texUnit, const GLchar * fileName) {
 	//loading images
 	int w, h, n;
 	auto *data = stbi_load(fileName, &w, &h, &n, 0);
-	std::cout << w << " " << h << std::endl;
 	if (data) {
 		GLuint format = n == 4 ? GL_RGBA : GL_RGB;
 		glTexImage2D(GL_TEXTURE_2D, 0, format, w, h, 0, format, GL_UNSIGNED_BYTE, data);
@@ -470,5 +469,6 @@ inline std::vector<NewVertex> genTexCube(const GLfloat size, const unsigned int 
 
 	return mesh;
 }
+
 
 #endif
