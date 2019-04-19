@@ -1,7 +1,8 @@
 #version 330 core
 
 layout(location = 0) in vec3 v_pos; 
-layout(location = 1) in vec2 v_tex;
+layout(location = 1) in vec3 v_normal;
+layout(location = 2) in vec2 v_tex;
 
 out vec2 o_tex;
 // out vec4 o_color;

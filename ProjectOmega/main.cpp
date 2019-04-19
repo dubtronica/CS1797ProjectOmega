@@ -224,6 +224,8 @@ int main() {
 
 	GLuint cubeTexVAO, cubeTexVBO;
 	auto texcube = genTexCube(0.5f, 1);
+	//auto texcube = genTexPlane(glm::vec3(0, 1, 0), glm::vec3(1, 0, 0), glm::vec3(-1, -1, 0), 1);
+
 	{
 		glGenVertexArrays(1, &cubeTexVAO);
 		glBindVertexArray(cubeTexVAO);
@@ -234,8 +236,10 @@ int main() {
 		glBufferData(GL_ARRAY_BUFFER, texcube.size() * sizeof(NewVertex), texcube.data(), GL_STATIC_DRAW);
 		glEnableVertexAttribArray(0);
 		glEnableVertexAttribArray(1);
+		glEnableVertexAttribArray(2);
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(NewVertex), 0);
-		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(NewVertex), (void*)offsetof(NewVertex, u));
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(NewVertex), (void*)offsetof(NewVertex, x1));
+		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(NewVertex), (void*)offsetof(NewVertex, u));
 	}
 
 	GLuint planeVAO, planeVBO;
@@ -445,7 +449,7 @@ int main() {
 				glDrawArrays(GL_TRIANGLE_STRIP, 0, sphere.size());
 			}
 
-			// first cube
+			// pool
 			{
 				glFrontFace(GL_CW);
 				glm::mat4 model = glm::mat4(1.f);

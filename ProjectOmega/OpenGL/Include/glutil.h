@@ -239,6 +239,7 @@ inline void loadTexture(GLuint* tex, GLuint texUnit, const GLchar * fileName) {
 	//loading images
 	int w, h, n;
 	auto *data = stbi_load(fileName, &w, &h, &n, 0);
+	std::cout << w << " " << h << std::endl;
 	if (data) {
 		GLuint format = n == 4 ? GL_RGBA : GL_RGB;
 		glTexImage2D(GL_TEXTURE_2D, 0, format, w, h, 0, format, GL_UNSIGNED_BYTE, data);
@@ -384,6 +385,7 @@ Matrix4 scale(Matrix4 mat, GLfloat x, GLfloat y, GLfloat z) {
 }
 
 //================================== with texture ========================================
+
 inline std::vector<NewVertex> genTexPlane(glm::vec3 u, glm::vec3 v, const glm::vec3& start, const GLuint resolution) {
 	/*
 	 Generates a plane
