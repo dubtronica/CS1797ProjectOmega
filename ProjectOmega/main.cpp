@@ -225,7 +225,6 @@ int main() {
 	GLuint cubeTexVAO, cubeTexVBO;
 	auto texcube = genTexCube(0.5f, 1);
 	//auto texcube = genTexPlane(glm::vec3(0, 1, 0), glm::vec3(1, 0, 0), glm::vec3(-1, -1, 0), 1);
-
 	{
 		glGenVertexArrays(1, &cubeTexVAO);
 		glBindVertexArray(cubeTexVAO);
@@ -256,6 +255,25 @@ int main() {
 		glEnableVertexAttribArray(1);
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
 		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, x1));
+	}
+
+	GLuint planeTexVAO, planeTexVBO;
+	//auto plane = genPlane(glm::vec3(.2, .4, .3), glm::vec3(.3, .4, .2), glm::vec3(0, -.5, 0), 100);
+	auto planeTex = genTexPlane(glm::vec3(0, 0, .5), glm::vec3(.5, 0, 0), glm::vec3(-.25f, 0.2, -.25f), 1);
+	{
+		glGenVertexArrays(1, &planeTexVAO);
+		glBindVertexArray(planeTexVAO);
+		glGenBuffers(1, &planeTexVBO);
+		glBindBuffer(GL_ARRAY_BUFFER, planeTexVBO);
+		glBindVertexArray(planeTexVAO);
+
+		glBufferData(GL_ARRAY_BUFFER, planeTex.size() * sizeof(NewVertex), planeTex.data(), GL_STATIC_DRAW);
+		glEnableVertexAttribArray(0);
+		glEnableVertexAttribArray(1);
+		glEnableVertexAttribArray(2);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(NewVertex), 0);
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(NewVertex), (void*)offsetof(NewVertex, x1));
+		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(NewVertex), (void*)offsetof(NewVertex, u));
 	}
 
 	GLuint screenVAO, screenVBO;
@@ -434,19 +452,21 @@ int main() {
 			view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
 			proj = glm::perspective(glm::radians(45.f), (float)(SCR_WIDTH / SCR_HEIGHT), .1f, 100.f);
 
-			//first sphere
+			// water plane
 			{
 				glm::mat4 model = glm::mat4(1.f);
+				// model = glm::rotate(model, 90.f * PI / 180.f, glm::vec3(1.f, 0.f, 0.f));
 				glUseProgram(sphereprogram);
 				glUniformMatrix4fv(u_model, 1, GL_FALSE, glm::value_ptr(model));
 				glUniformMatrix4fv(u_view, 1, GL_FALSE, glm::value_ptr(view));
 				glUniformMatrix4fv(u_proj, 1, GL_FALSE, glm::value_ptr(proj));
-				glUniform3fv(u_eyepos, 1, (GLfloat*)&cameraPos);
+				glUniform3fv(u_eyepos, 1, (GLfloat*)& cameraPos);
 
 				glActiveTexture(GL_TEXTURE0);
+				//glBindTexture(GL_TEXTURE_2D, pooltex);
 				glBindTexture(GL_TEXTURE_CUBE_MAP, sbox);
-				glBindVertexArray(sphereVAO);
-				glDrawArrays(GL_TRIANGLE_STRIP, 0, sphere.size());
+				glBindVertexArray(planeTexVAO);
+				glDrawArrays(GL_TRIANGLE_STRIP, 0, planeTex.size());
 			}
 
 			// pool
