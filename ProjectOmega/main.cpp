@@ -417,8 +417,8 @@ int main() {
 
 				glActiveTexture(GL_TEXTURE0);
 				glBindTexture(GL_TEXTURE_CUBE_MAP, sbox);
-				glBindVertexArray(cubeVAO);
-				glDrawArrays(GL_TRIANGLE_STRIP, 0, cube.size());
+				glBindVertexArray(sphereVAO);
+				glDrawArrays(GL_TRIANGLE_STRIP, 0, sphere.size());
 			}
 
 			//skybox

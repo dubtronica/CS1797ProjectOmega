@@ -17,6 +17,10 @@ void main(){
 	vec3 reflection = reflect(incidence, normalize(o_normals));
 	vec3 refraction = refract(incidence, normalize(o_normals), value);
 
+	if(fresnel < 0.3){
+		fresnel = 0.3;
+	} 
+
 	vec4 reflectcolor = vec4(texture(skybox, reflection).rgb, 1.0);
 	vec4 refractcolor = vec4(texture(skybox, refraction).rgb, 1.0);
 		
