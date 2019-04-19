@@ -18,6 +18,31 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="combine.fsh" />
+    <None Include="frame.fsh" />
+    <None Include="reflect.fsh" />
+    <None Include="refract.fsh" />
+    <None Include="skybox.fsh" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="frame.vsh">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="reflect.vsh">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="refract.vsh">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="skybox.vsh">
+      <FileType>Document</FileType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="glad.c" />
+    <ClCompile Include="main.cpp" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <ProjectGuid>{C75559B2-0DD0-4A9D-AD2C-41ED80CE02F5}</ProjectGuid>
@@ -131,31 +156,6 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <None Include="combine.fsh" />
-    <None Include="frame.fsh" />
-    <None Include="reflect.fsh" />
-    <None Include="refract.fsh" />
-    <None Include="skybox.fsh" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="frame.vsh">
-      <FileType>Document</FileType>
-    </None>
-    <None Include="reflect.vsh">
-      <FileType>Document</FileType>
-    </None>
-    <None Include="refract.vsh">
-      <FileType>Document</FileType>
-    </None>
-    <None Include="skybox.vsh">
-      <FileType>Document</FileType>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="glad.c" />
-    <ClCompile Include="HW05_Main.cpp" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

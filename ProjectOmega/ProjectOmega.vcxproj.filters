@@ -15,9 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="combine.fsh">
-      <Filter>Source Files</Filter>
-    </None>
     <None Include="frame.fsh">
       <Filter>Source Files</Filter>
     </None>
@@ -42,12 +39,15 @@
     <None Include="skybox.vsh">
       <Filter>Source Files</Filter>
     </None>
+    <None Include="combine.fsh">
+      <Filter>Source Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="glad.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="HW05_Main.cpp">
+    <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

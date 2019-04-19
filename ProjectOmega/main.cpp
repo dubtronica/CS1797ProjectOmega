@@ -33,10 +33,10 @@ mouse_lastY = SCR_HEIGHT / 2.f,		// to keep track of mouse position
 yaw = -90.f,						// camera yaw 
 pitch = 0;	// camera pitch
 
-int selection = 1;
-
 bool
 firstMouse = true, refMode = true;			// fixing the mouse location upon startup (check camera slides)                    // input management (so the key is not repeated until released)
+
+int selection = 1;
 
 float skybox[] = {
 	// positions          
@@ -372,13 +372,10 @@ int main() {
 	glUniform1i(c_pristineTex, 3);
 	glUniform1i(c_blurTex, 4);
 	glUniform1i(c_depthTex, 5);
-	
 
 	/// render loop
 	while (!glfwWindowShouldClose(window)) {
 		processInput(window);
-
-		std::cout << selection << std::endl;
 
 		//bind pristineFbo and render
 		{
@@ -537,9 +534,7 @@ int main() {
 			glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 		}
 
-		//hi jasmine
-		//this is fun aujdhdafffewc ewcgfcftr
-		// hello
+
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 
@@ -556,16 +551,16 @@ int main() {
 }
 // process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
 void processInput(GLFWwindow *window) {
+	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+		glfwSetWindowShouldClose(window, true);	
 	if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
-		selection = 1; //just added this for selecting through stuff, go check out combine.fsh
+		selection = 1;
 	if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
 		selection = 2;
 	if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS)
 		selection = 3;
 	if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS)
 		selection = 4;
-	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-		exit(0);
 }
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
