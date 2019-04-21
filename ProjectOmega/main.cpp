@@ -207,7 +207,7 @@ int main() {
 	}
 
 	GLuint cubeVAO, cubeVBO;
-	auto cube = genCube(0.25f, 50);
+	auto cube = genCube(0.5f, 50);
 	{
 		glGenVertexArrays(1, &cubeVAO);
 		glBindVertexArray(cubeVAO);
@@ -391,7 +391,7 @@ int main() {
 	//render programs
 	GLuint sphereprogram = loadProgram("shaders/reflect.vsh", "shaders/reflect.fsh");
 
-	GLuint u_cube, u_model, u_view, u_proj, u_eyepos, u_dudv;
+	GLuint u_cube, u_model, u_view, u_proj, u_eyepos, u_dudv, u_pooltex;
 	{
 		u_cube = glGetUniformLocation(sphereprogram, "skybox");
 		u_model = glGetUniformLocation(sphereprogram, "model");
@@ -399,6 +399,7 @@ int main() {
 		u_proj = glGetUniformLocation(sphereprogram, "projection");
 		u_eyepos = glGetUniformLocation(sphereprogram, "eye_pos");
 		u_dudv = glGetUniformLocation(sphereprogram, "dudv");
+		u_pooltex = glGetUniformLocation(sphereprogram, "pooltex");
 	}
 
 	//blur program
@@ -455,18 +456,20 @@ int main() {
 			// water plane
 			{
 				glm::mat4 model = glm::mat4(1.f);
+				model = glm::scale(model, glm::vec3(1.f, 0.8f, 1.f));
 				// model = glm::rotate(model, 90.f * PI / 180.f, glm::vec3(1.f, 0.f, 0.f));
 				glUseProgram(sphereprogram);
 				glUniformMatrix4fv(u_model, 1, GL_FALSE, glm::value_ptr(model));
 				glUniformMatrix4fv(u_view, 1, GL_FALSE, glm::value_ptr(view));
 				glUniformMatrix4fv(u_proj, 1, GL_FALSE, glm::value_ptr(proj));
 				glUniform3fv(u_eyepos, 1, (GLfloat*)& cameraPos);
+				glUniform1i(u_pooltex, 7);
 
 				glActiveTexture(GL_TEXTURE0);
-				//glBindTexture(GL_TEXTURE_2D, pooltex);
+				glBindTexture(GL_TEXTURE_2D, pooltex);
 				glBindTexture(GL_TEXTURE_CUBE_MAP, sbox);
-				glBindVertexArray(planeTexVAO);
-				glDrawArrays(GL_TRIANGLE_STRIP, 0, planeTex.size());
+				glBindVertexArray(cubeTexVAO);
+				glDrawArrays(GL_TRIANGLE_STRIP, 0, texcube.size());
 			}
 
 			// pool
