@@ -419,13 +419,15 @@ int main() {
 	//render programs
 	GLuint sphereprogram = loadProgram("shaders/reflect.vsh", "shaders/reflect.fsh");
 
-	GLuint u_cube, u_model, u_view, u_proj, u_eyepos, u_dudv, u_pooltex, u_time, u_style;
+	GLuint u_cube, u_model, u_view, u_proj, u_eyepos, u_lightpos, u_lightcolor, u_dudv, u_pooltex, u_time, u_style;
 	{
 		u_cube = glGetUniformLocation(sphereprogram, "skybox");
 		u_model = glGetUniformLocation(sphereprogram, "model");
 		u_view = glGetUniformLocation(sphereprogram, "view");
 		u_proj = glGetUniformLocation(sphereprogram, "projection");
 		u_eyepos = glGetUniformLocation(sphereprogram, "eye_pos");
+		u_lightpos = glGetUniformLocation(sphereprogram, "lightpos");
+		u_lightcolor = glGetUniformLocation(sphereprogram, "lightcolor");
 		u_dudv = glGetUniformLocation(sphereprogram, "dudv");
 		u_pooltex = glGetUniformLocation(sphereprogram, "pooltex");
 		u_time = glGetUniformLocation(sphereprogram, "time");
@@ -485,6 +487,9 @@ int main() {
 	glUseProgram(poolprogram);
 	glUniform1i(p_pool_tex, 7);
 
+	glm::vec3 lightpos(0.0, 0.7, -0.4);
+	glm::vec3 lightcol(1, 1, 1);
+
 	/// render loop
 	while (!glfwWindowShouldClose(window)) {
 		processInput(window);
@@ -535,7 +540,10 @@ int main() {
 				glUniformMatrix4fv(u_view, 1, GL_FALSE, glm::value_ptr(view));
 				glUniformMatrix4fv(u_proj, 1, GL_FALSE, glm::value_ptr(proj));
 				glUniform3fv(u_eyepos, 1, (GLfloat*)& cameraPos);
+				glUniform3fv(u_lightpos, 1, (GLfloat*)& lightpos);
+				glUniform3fv(u_lightcolor, 1, (GLfloat*)& lightcol);
 				
+
 				glUniform1i(u_style, style);
 				
 				glUniform1f(u_time, glfwGetTime());

@@ -17,7 +17,7 @@ uniform float time;
 uniform int style;
 
 void main() {
-	o_normals = mat3(transpose(inverse(model))) * v_normals;
+	
 
 	vec3 temp_pos = v_pos;
 	if (style % 3 == 0)
@@ -38,6 +38,7 @@ void main() {
 			temp_pos.y -= 0.01;
 	}
 
+	o_normals = mat3(transpose(inverse(model))) * v_normals;
 	o_texcoords = v_texcoords;
 	o_pos = vec3(model * vec4(temp_pos, 1.0));
 	gl_Position = projection * view * model * vec4(v_pos, 1.0);
