@@ -259,7 +259,7 @@ int main() {
 
 	GLuint planeTexVAO, planeTexVBO;
 	//auto plane = genPlane(glm::vec3(.2, .4, .3), glm::vec3(.3, .4, .2), glm::vec3(0, -.5, 0), 100);
-	auto planeTex = genTexPlane(glm::vec3(0, 0, .5), glm::vec3(.5, 0, 0), glm::vec3(-.25f, 0.2, -.25f), 1);
+	auto planeTex = genTexPlane(glm::vec3(0, 0, .5), glm::vec3(.5, 0, 0), glm::vec3(-.25f, 0.2, -.25f), 100);
 	{
 		glGenVertexArrays(1, &planeTexVAO);
 		glBindVertexArray(planeTexVAO);
@@ -391,7 +391,7 @@ int main() {
 	//render programs
 	GLuint sphereprogram = loadProgram("shaders/reflect.vsh", "shaders/reflect.fsh");
 
-	GLuint u_cube, u_model, u_view, u_proj, u_eyepos, u_dudv, u_pooltex;
+	GLuint u_cube, u_model, u_view, u_proj, u_eyepos, u_dudv, u_pooltex, u_time, u_style;
 	{
 		u_cube = glGetUniformLocation(sphereprogram, "skybox");
 		u_model = glGetUniformLocation(sphereprogram, "model");
@@ -400,6 +400,8 @@ int main() {
 		u_eyepos = glGetUniformLocation(sphereprogram, "eye_pos");
 		u_dudv = glGetUniformLocation(sphereprogram, "dudv");
 		u_pooltex = glGetUniformLocation(sphereprogram, "pooltex");
+		u_time = glGetUniformLocation(sphereprogram, "time");
+		u_style = glGetUniformLocation(sphereprogram, "style");
 	}
 
 	//blur program
@@ -464,12 +466,15 @@ int main() {
 				glUniformMatrix4fv(u_proj, 1, GL_FALSE, glm::value_ptr(proj));
 				glUniform3fv(u_eyepos, 1, (GLfloat*)& cameraPos);
 				glUniform1i(u_pooltex, 7);
+				glUniform1i(u_style, 1);
+				
+				glUniform1f(u_time, glfwGetTime());
 
 				glActiveTexture(GL_TEXTURE0);
 				glBindTexture(GL_TEXTURE_2D, pooltex);
 				glBindTexture(GL_TEXTURE_CUBE_MAP, sbox);
-				glBindVertexArray(cubeTexVAO);
-				glDrawArrays(GL_TRIANGLE_STRIP, 0, texcube.size());
+				glBindVertexArray(planeTexVAO);
+				glDrawArrays(GL_TRIANGLE_STRIP, 0, planeTex.size());
 			}
 
 			// pool
