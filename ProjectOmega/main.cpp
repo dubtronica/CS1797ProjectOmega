@@ -548,7 +548,7 @@ int main() {
 				
 				glUniform1f(u_time, glfwGetTime());
 
-				glUniform1i(p_pool_tex, 8);
+				glUniform1i(u_pooltex, 8);
 				glBindTexture(GL_TEXTURE_CUBE_MAP, sbox);
 				glBindVertexArray(newPlaneVAO);
 				glDrawArrays(GL_TRIANGLE_STRIP, 0, newPlane.size());
