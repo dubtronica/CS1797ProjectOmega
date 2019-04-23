@@ -417,7 +417,7 @@ int main() {
 	glUniform1i(s_cube, 0);
 
 	//render programs
-	GLuint sphereprogram = loadProgram("shaders/reflect.vsh", "shaders/reflect.fsh");
+	GLuint sphereprogram = loadProgram("shaders/reflect.vsh", "shaders/reflect.gsh", "shaders/reflect.fsh");
 
 	GLuint u_cube, u_model, u_view, u_proj, u_eyepos, u_lightpos, u_lightcolor, u_dudv, u_pooltex, u_time, u_style;
 	{
@@ -487,7 +487,7 @@ int main() {
 	glUseProgram(poolprogram);
 	glUniform1i(p_pool_tex, 7);
 
-	glm::vec3 lightpos(0.0, 0.7, -0.4);
+	glm::vec3 lightpos(-0.3, 0.7, -0.2);
 	glm::vec3 lightcol(1, 1, 1);
 
 	/// render loop

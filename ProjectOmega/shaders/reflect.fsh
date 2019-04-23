@@ -6,7 +6,7 @@ in vec3 o_pos;
 in vec3 o_normals;
 in vec4 clipSpace;
 
-uniform vec3 eye_pos;
+uniform vec3 eye_pos, lightpos, lightcolor;
 uniform samplerCube skybox;
 uniform sampler2D dudv;
 uniform sampler2D pooltex;
@@ -29,10 +29,15 @@ void main(){
 		fresnel = 0.15;
 	} 
 
+	vec3 reflectlight = reflect(normalize(lightpos - o_pos), o_normals);
+	float specular = max( dot(reflectlight, incidence), 0.0);
+	specular = pow(specular, 20.0);
+	vec3 highlights = lightcolor * specular * 0.6;
+
 	vec4 wallcolor = texture(pooltex, ndc);
 
 	vec4 reflectcolor = vec4(texture(skybox, reflection).rgb, 1.0);
 	vec4 refractcolor = mix(wallcolor, vec4(texture(skybox, refraction).rgb, 1.0), 0.5);
 		
-	color = mix(mix(reflectcolor, refractcolor, fresnel), vec4(0.0, 0.5, 0.5, 1.0), 0.6);
+	color = mix(mix(reflectcolor, refractcolor, fresnel), vec4(0.0, 0.5, 0.5, 1.0), 0.6) + vec4(highlights, 0.0);
 }
