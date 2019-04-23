@@ -94,7 +94,7 @@ inline GLuint loadProgram(const GLchar* vsh, const GLchar* fsh) {
 	return ID;
 }
 
-inline GLuint loadProgram(const GLchar* vsh, const GLchar* fsh, const GLchar* gsh) {
+inline GLuint loadProgram(const GLchar* vsh, const GLchar* gsh, const GLchar* fsh) {
 	/*
 	Loads a shader program. Takes 2 strings as arguments: file name of vertex shader, file name of fragment shader
 	*/
@@ -103,42 +103,42 @@ inline GLuint loadProgram(const GLchar* vsh, const GLchar* fsh, const GLchar* gs
 
 	// 1. retrieve the vertex/fragment source code from filePath
 	std::string vertexCode;
-	std::string fragmentCode;
 	std::string geometryCode;
+	std::string fragmentCode;
 	std::ifstream vShaderFile;
-	std::ifstream fShaderFile;
 	std::ifstream gShaderFile;
+	std::ifstream fShaderFile;
 	// ensure ifstream objects can throw exceptions:
 	vShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
-	fShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
 	gShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+	fShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
 	try {
 		// open files
 		vShaderFile.open(vsh);
-		fShaderFile.open(fsh);
 		gShaderFile.open(gsh);
-		std::stringstream vShaderStream, fShaderStream, gShaderStream;
+		fShaderFile.open(fsh);
+		std::stringstream vShaderStream, gShaderStream, fShaderStream;
 		// read file's buffer contents into streams
 		vShaderStream << vShaderFile.rdbuf();
-		fShaderStream << fShaderFile.rdbuf();
 		gShaderStream << gShaderFile.rdbuf();
+		fShaderStream << fShaderFile.rdbuf();
 		// close file handlers
 		vShaderFile.close();
-		fShaderFile.close();
 		gShaderFile.close();
+		fShaderFile.close();
 		// convert stream into string
 		vertexCode = vShaderStream.str();
-		fragmentCode = fShaderStream.str();
 		geometryCode = gShaderStream.str();
+		fragmentCode = fShaderStream.str();
 	}
 	catch (std::ifstream::failure e) {
 		std::cout << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ" << std::endl;
 	}
 	const char* vShaderCode = vertexCode.c_str();
-	const char* fShaderCode = fragmentCode.c_str();
 	const char* gShaderCode = geometryCode.c_str();
+	const char* fShaderCode = fragmentCode.c_str();
 	// 2. compile shaders
-	unsigned int vertex, fragment, geometry;
+	unsigned int vertex, geometry, fragment;
 	int success;
 	char infoLog[512];
 	// vertex shader
@@ -146,32 +146,32 @@ inline GLuint loadProgram(const GLchar* vsh, const GLchar* fsh, const GLchar* gs
 	glShaderSource(vertex, 1, &vShaderCode, NULL);
 	glCompileShader(vertex);
 	checkForErrors(vertex, "VERTEX");
+	// geometry Shader
+	geometry = glCreateShader(GL_GEOMETRY_SHADER);
+	glShaderSource(geometry, 1, &gShaderCode, NULL);
+	glCompileShader(geometry);
+	checkForErrors(geometry, "GEOMETRY");
 	// fragment Shader
 	fragment = glCreateShader(GL_FRAGMENT_SHADER);
 	glShaderSource(fragment, 1, &fShaderCode, NULL);
 	glCompileShader(fragment);
 	checkForErrors(fragment, "FRAGMENT");
-	// fragment Shader
-	fragment = glCreateShader(GL_GEOMETRY_SHADER);
-	glShaderSource(geometry, 1, &gShaderCode, NULL);
-	glCompileShader(geometry);
-	checkForErrors(geometry, "GEOMETRY");
 	// shader Program
 	ID = glCreateProgram();
 	glAttachShader(ID, vertex);
-	glAttachShader(ID, fragment);
 	glAttachShader(ID, geometry);
+	glAttachShader(ID, fragment);
 	glLinkProgram(ID);
 	checkForErrors(ID, "PROGRAM");
 	// delete the shaders as they're linked into our program now and no longer necessary
 	glDeleteShader(vertex);
-	glDeleteShader(fragment);
 	glDeleteShader(geometry);
+	glDeleteShader(fragment);
 
 	return ID;
 }
 
-inline std::vector<Vertex> genPlane(glm::vec3 u, glm::vec3 v, const glm::vec3 &start, const GLuint resolution) {
+inline std::vector<Vertex> genPlane(glm::vec3 u, glm::vec3 v, const glm::vec3& start, const GLuint resolution) {
 	/*
 	Generates a plane
 	u -> one side of the plane
@@ -209,7 +209,7 @@ inline std::vector<Vertex> genPlane(glm::vec3 u, glm::vec3 v, const glm::vec3 &s
 	return mesh;
 }
 
-inline std::vector<Vertex> genCube(const GLfloat size, const unsigned int resolution, const glm::vec3 &offset = glm::vec3(0)) {
+inline std::vector<Vertex> genCube(const GLfloat size, const unsigned int resolution, const glm::vec3 & offset = glm::vec3(0)) {
 	/*
 	Uses genPlane 6 times to make a cube
 	size -> length of a side
@@ -221,17 +221,17 @@ inline std::vector<Vertex> genCube(const GLfloat size, const unsigned int resolu
 	for (GLuint side = 0; side < 6; ++side) {
 		switch (side >> 1) {
 		case 0:
-			o = glm::vec3(size*0.5, 0, 0);
+			o = glm::vec3(size * 0.5, 0, 0);
 			u = glm::vec3(0, 0, -size);
 			v = glm::vec3(0, size, 0);
 			break;
 		case 1:
-			o = glm::vec3(0, size*0.5, 0);
+			o = glm::vec3(0, size * 0.5, 0);
 			u = glm::vec3(size, 0, 0);
 			v = glm::vec3(0, 0, -size);
 			break;
 		case 2:
-			o = glm::vec3(0, 0, size*0.5);
+			o = glm::vec3(0, 0, size * 0.5);
 			u = glm::vec3(size, 0, 0);
 			v = glm::vec3(0, size, 0);
 			break;
@@ -245,7 +245,7 @@ inline std::vector<Vertex> genCube(const GLfloat size, const unsigned int resolu
 		}
 		o -= (u + v) / 2.f;
 
-		const auto &p = genPlane(u, v, o + offset, resolution);
+		const auto & p = genPlane(u, v, o + offset, resolution);
 		if (!mesh.empty()) {
 			mesh.push_back(mesh.back());
 			mesh.push_back(p.front());
@@ -256,13 +256,13 @@ inline std::vector<Vertex> genCube(const GLfloat size, const unsigned int resolu
 	return mesh;
 }
 
-inline std::vector<Vertex> genSphere(GLfloat radius, GLuint resolution, const glm::vec3 &offset = glm::vec3(0)) {
+inline std::vector<Vertex> genSphere(GLfloat radius, GLuint resolution, const glm::vec3 & offset = glm::vec3(0)) {
 	/*
 	Uses genCube to generate a sphere
 	Offsets the vertices of each cube by radius relative to a center, and is then offset to position (offset)
 	*/
 	auto cube = genCube(1.f, resolution);
-	for (Vertex &v : cube) {
+	for (Vertex& v : cube) {
 		glm::vec3 pos(v.x, v.y, v.z);
 		pos = pos * (radius / glm::length(pos)) + offset;
 
@@ -298,7 +298,7 @@ inline void checkForErrors(unsigned int shader, std::string type) {
 	}
 }
 
-inline void loadTexture(GLuint* tex, GLuint texUnit, const GLchar * fileName) {
+inline void loadTexture(GLuint * tex, GLuint texUnit, const GLchar * fileName) {
 	/*
 	Loads 2D textures
 	tex -> GLuint where to store the texture
@@ -315,7 +315,7 @@ inline void loadTexture(GLuint* tex, GLuint texUnit, const GLchar * fileName) {
 
 	//loading images
 	int w, h, n;
-	auto *data = stbi_load(fileName, &w, &h, &n, 0);
+	auto * data = stbi_load(fileName, &w, &h, &n, 0);
 	if (data) {
 		GLuint format = n == 4 ? GL_RGBA : GL_RGB;
 		glTexImage2D(GL_TEXTURE_2D, 0, format, w, h, 0, format, GL_UNSIGNED_BYTE, data);
@@ -419,7 +419,7 @@ Matrix4 rotate(Matrix4 mat, GLfloat a, GLfloat x, GLfloat y, GLfloat z) {
 	GLfloat angle = a * PI / 180.f;
 
 	// normalize the direction vector
-	GLfloat mag = sqrt(x*x + y * y + z * z);
+	GLfloat mag = sqrt(x * x + y * y + z * z);
 	x /= mag;
 	y /= mag;
 	z /= mag;
@@ -462,7 +462,7 @@ Matrix4 scale(Matrix4 mat, GLfloat x, GLfloat y, GLfloat z) {
 
 //================================== with texture ========================================
 
-inline std::vector<NewVertex> genTexPlane(glm::vec3 u, glm::vec3 v, const glm::vec3& start, const GLuint resolution) {
+inline std::vector<NewVertex> genTexPlane(glm::vec3 u, glm::vec3 v, const glm::vec3 & start, const GLuint resolution) {
 	/*
 	 Generates a plane
 	 u -> one side of the plane
@@ -500,7 +500,7 @@ inline std::vector<NewVertex> genTexPlane(glm::vec3 u, glm::vec3 v, const glm::v
 	return mesh;
 }
 
-inline std::vector<NewVertex> genTexCube(const GLfloat size, const unsigned int resolution, const glm::vec3& offset = glm::vec3(0)) {
+inline std::vector<NewVertex> genTexCube(const GLfloat size, const unsigned int resolution, const glm::vec3 & offset = glm::vec3(0)) {
 	/*
 	 Uses genPlane 6 times to make a cube
 	 size -> length of a side
@@ -536,7 +536,7 @@ inline std::vector<NewVertex> genTexCube(const GLfloat size, const unsigned int 
 		}
 		o -= (u + v) / 2.f;
 
-		const auto& p = genTexPlane(u, v, o + offset, resolution);
+		const auto & p = genTexPlane(u, v, o + offset, resolution);
 		if (!mesh.empty()) {
 			mesh.push_back(mesh.back());
 			mesh.push_back(p.front());

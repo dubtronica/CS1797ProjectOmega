@@ -31,9 +31,4 @@ void main(){
 	} else if(selection == 4){
 		comb_color = vec4(vec3(gray2), 1.0);
 	}
-	
-	
-
-
-
 }

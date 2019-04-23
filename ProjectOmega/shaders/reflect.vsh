@@ -2,12 +2,9 @@
 
 layout(location = 0) in vec3 v_pos;
 layout(location = 1) in vec3 v_normals;
-layout(location = 2) in vec2 v_texcoords;
 
-out vec3 o_pos;
-out vec3 o_normals;
-out vec2 o_texcoords;
-out vec4 clipSpace;
+out vec3 g_pos;
+out vec4 g_clipSpace;
 
 uniform mat4 model;
 uniform mat4 view;
@@ -17,8 +14,6 @@ uniform float time;
 uniform int style;
 
 void main() {
-	
-
 	vec3 temp_pos = v_pos;
 	if (style % 3 == 0)
 	{
@@ -38,9 +33,7 @@ void main() {
 			temp_pos.y -= 0.01;
 	}
 
-	o_normals = mat3(transpose(inverse(model))) * v_normals;
-	o_texcoords = v_texcoords;
-	o_pos = vec3(model * vec4(temp_pos, 1.0));
+	g_pos = vec3(model * vec4(temp_pos, 1.0));
 	gl_Position = projection * view * model * vec4(v_pos, 1.0);
-	clipSpace = gl_Position;
+	g_clipSpace = gl_Position;
 }
