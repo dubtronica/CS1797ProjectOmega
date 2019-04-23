@@ -3,12 +3,12 @@
 out vec4 color;
 
 in vec3 o_pos;
-in vec2 o_tex;
+in vec2 o_texcoords;
 //in vec4 o_color;
 
 uniform sampler2D poolTexture;
 
 void main(){
-	color = texture(poolTexture, o_tex);
+	color = texture(poolTexture, o_texcoords);
 	//color = o_color;
 }

@@ -99,6 +99,7 @@ vector<string> faces = { "textures/px.jpg", "textures/nx.jpg", "textures/py.jpg"
 GLuint loadCubemap(vector<string> f) {
 	GLuint texID;
 	glGenTextures(1, &texID);
+	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, texID);
 
 	int width, height, n;
@@ -177,6 +178,7 @@ int main() {
 		glEnable(GL_DEPTH_TEST);										// enable depth test
 		glEnable(GL_CULL_FACE);											// enable face culling
 		glCullFace(GL_BACK);											// cull back-facing polygons (GL_BACK by default but calling anyway)
+		glEnable(GL_CLIP_DISTANCE0);
 	}
 
 	
@@ -257,17 +259,17 @@ int main() {
 		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, x1));
 	}
 
-	GLuint planeTexVAO, planeTexVBO;
+	GLuint newPlaneVAO, newPlaneVBO;
 	//auto plane = genPlane(glm::vec3(.2, .4, .3), glm::vec3(.3, .4, .2), glm::vec3(0, -.5, 0), 100);
-	auto planeTex = genTexPlane(glm::vec3(0, 0, .5), glm::vec3(.5, 0, 0), glm::vec3(-.25f, 0.2, -.25f), 100);
+	auto newPlane = genTexPlane(glm::vec3(0, 0, .5), glm::vec3(.5, 0, 0), glm::vec3(-.25f, 0.2, -.25f), 100);
 	{
-		glGenVertexArrays(1, &planeTexVAO);
-		glBindVertexArray(planeTexVAO);
-		glGenBuffers(1, &planeTexVBO);
-		glBindBuffer(GL_ARRAY_BUFFER, planeTexVBO);
-		glBindVertexArray(planeTexVAO);
+		glGenVertexArrays(1, &newPlaneVAO);
+		glBindVertexArray(newPlaneVAO);
+		glGenBuffers(1, &newPlaneVBO);
+		glBindBuffer(GL_ARRAY_BUFFER, newPlaneVBO);
+		glBindVertexArray(newPlaneVAO);
 
-		glBufferData(GL_ARRAY_BUFFER, planeTex.size() * sizeof(NewVertex), planeTex.data(), GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, newPlane.size() * sizeof(NewVertex), newPlane.data(), GL_STATIC_DRAW);
 		glEnableVertexAttribArray(0);
 		glEnableVertexAttribArray(1);
 		glEnableVertexAttribArray(2);
@@ -371,9 +373,12 @@ int main() {
 		}
 	}
 
-	// generate framebuffer to store area under the pool
+	// generate and bind framebuffer to store area under the pool
 	GLuint refractFbo;
-	glGenFramebuffers(1, &refractFbo);
+	{
+		glGenFramebuffers(1, &refractFbo);
+		glBindFramebuffer(GL_FRAMEBUFFER, refractFbo);
+	}
 
 	// generate refraction texture
 	GLuint refractTex;
@@ -387,6 +392,9 @@ int main() {
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	}
+
+	// add refractTex to refractFbo
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, refractTex, 0);
 
 	///loading programs 
 
@@ -405,6 +413,9 @@ int main() {
 	auto s_view = glGetUniformLocation(skyboxprogram, "view");
 	auto s_proj = glGetUniformLocation(skyboxprogram, "projection");
 
+	glUseProgram(skyboxprogram);
+	glUniform1i(s_cube, 0);
+
 	//render programs
 	GLuint sphereprogram = loadProgram("shaders/reflect.vsh", "shaders/reflect.fsh");
 
@@ -420,9 +431,6 @@ int main() {
 		u_time = glGetUniformLocation(sphereprogram, "time");
 		u_style = glGetUniformLocation(sphereprogram, "style");
 	}
-
-	glUseProgram(sphereprogram);
-	glUniform1f(u_pooltex, 7);
 
 	//blur program
 	GLuint frameprogram = loadProgram("shaders/frame.vsh", "shaders/frame.fsh");
@@ -450,12 +458,13 @@ int main() {
 	glUniform1i(c_depthTex, 5);
 
 	GLuint poolprogram = loadProgram("shaders/plain.vsh", "shaders/plain.fsh");
-	GLuint p_model, p_view, p_proj, p_pool_tex;
+	GLuint p_model, p_view, p_proj, p_pool_tex, p_clipping_plane;
 	{
 		p_model = glGetUniformLocation(poolprogram, "model");
 		p_view = glGetUniformLocation(poolprogram, "view");
 		p_proj = glGetUniformLocation(poolprogram, "projection");
 		p_pool_tex = glGetUniformLocation(poolprogram, "poolTexture");
+		p_clipping_plane = glGetUniformLocation(poolprogram, "clipping_plane");
 	}
 	
 	glUseProgram(poolprogram);
@@ -465,9 +474,33 @@ int main() {
 	while (!glfwWindowShouldClose(window)) {
 		processInput(window);
 
-		// render the pool and skybox to a framebuffer bound to a refractTex
-		// render the pool, water and skybox to a framebuffer bound to a pristinetex
-		// combine
+		// configuring matrices
+		glm::mat4 view, proj;
+		view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+		proj = glm::perspective(glm::radians(45.f), (float)(SCR_WIDTH / SCR_HEIGHT), .1f, 100.f);
+
+		// render the pool to a framebuffer bound to a refractTex
+		{
+			glBindFramebuffer(GL_FRAMEBUFFER, refractFbo);
+			glClearColor(0.1f, 0.3f, 0.5f, 1.0f);
+			glEnable(GL_DEPTH_TEST);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+			// pool
+			{
+				glFrontFace(GL_CW);
+				glm::mat4 model = glm::mat4(1.f);
+				glUseProgram(poolprogram);
+				glUniformMatrix4fv(p_model, 1, GL_FALSE, glm::value_ptr(model));
+				glUniformMatrix4fv(p_view, 1, GL_FALSE, glm::value_ptr(view));
+				glUniformMatrix4fv(p_proj, 1, GL_FALSE, glm::value_ptr(proj));
+				glUniform4fv(p_clipping_plane, 1, glm::value_ptr(glm::vec4(0, -1, 0, .2)));
+
+				glBindVertexArray(cubeTexVAO);
+				glDrawArrays(GL_TRIANGLE_STRIP, 0, texcube.size());
+				glFrontFace(GL_CCW);
+			}
+		}
 
 		//bind pristineFbo and render
 		{
@@ -476,29 +509,24 @@ int main() {
 			glEnable(GL_DEPTH_TEST);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-			// configuring matrices
-			glm::mat4 view, proj;
-			view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
-			proj = glm::perspective(glm::radians(45.f), (float)(SCR_WIDTH / SCR_HEIGHT), .1f, 100.f);
-
 			// water plane
 			{
 				glm::mat4 model = glm::mat4(1.f);
-				model = glm::scale(model, glm::vec3(1.f, 0.8f, 1.f));
+				// model = glm::scale(model, glm::vec3(1.f, 0.8f, 1.f));
 				// model = glm::rotate(model, 90.f * PI / 180.f, glm::vec3(1.f, 0.f, 0.f));
 				glUseProgram(sphereprogram);
 				glUniformMatrix4fv(u_model, 1, GL_FALSE, glm::value_ptr(model));
 				glUniformMatrix4fv(u_view, 1, GL_FALSE, glm::value_ptr(view));
 				glUniformMatrix4fv(u_proj, 1, GL_FALSE, glm::value_ptr(proj));
 				glUniform3fv(u_eyepos, 1, (GLfloat*)& cameraPos);
-				glUniform1i(u_pooltex, 7);
 				glUniform1i(u_style, 1);
-				
+
 				glUniform1f(u_time, glfwGetTime());
 
+				glUniform1i(p_pool_tex, 8);
 				glBindTexture(GL_TEXTURE_CUBE_MAP, sbox);
-				glBindVertexArray(planeTexVAO);
-				glDrawArrays(GL_TRIANGLE_STRIP, 0, planeTex.size());
+				glBindVertexArray(newPlaneVAO);
+				glDrawArrays(GL_TRIANGLE_STRIP, 0, newPlane.size());
 			}
 
 			// pool
@@ -509,6 +537,7 @@ int main() {
 				glUniformMatrix4fv(p_model, 1, GL_FALSE, glm::value_ptr(model));
 				glUniformMatrix4fv(p_view, 1, GL_FALSE, glm::value_ptr(view));
 				glUniformMatrix4fv(p_proj, 1, GL_FALSE, glm::value_ptr(proj));
+				glUniform4fv(p_clipping_plane, 1, glm::value_ptr(glm::vec4(0, 0, 0, 0)));
 
 				glBindVertexArray(cubeTexVAO);
 				glDrawArrays(GL_TRIANGLE_STRIP, 0, texcube.size());
@@ -520,13 +549,10 @@ int main() {
 				glDepthFunc(GL_LEQUAL);
 				glUseProgram(skyboxprogram);
 				view = glm::mat4(glm::mat3(glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp)));
-				glUniform1i(s_cube, sbox);
 				glUniformMatrix4fv(s_view, 1, GL_FALSE, glm::value_ptr(view));
 				glUniformMatrix4fv(s_proj, 1, GL_FALSE, glm::value_ptr(proj));
 
 				glBindVertexArray(skyboxVAO);
-				glActiveTexture(GL_TEXTURE0);
-				glBindTexture(GL_TEXTURE_CUBE_MAP, sbox);
 				glDrawArrays(GL_TRIANGLES, 0, 36);
 				glDepthFunc(GL_LESS);
 			}
@@ -534,6 +560,7 @@ int main() {
 
 		//perform blurring
 		{
+
 			glBindFramebuffer(GL_FRAMEBUFFER, blur[0]);
 			glActiveTexture(GL_TEXTURE3);
 			glBindTexture(GL_TEXTURE_2D, pristineTex);
@@ -575,6 +602,7 @@ int main() {
 
 			glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 		}
+
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
