@@ -20,7 +20,7 @@ void main(){
 	float value = 1.000 / 1.333;
 	float transparent = 1.000 / 1.000;
 
-	float fresnel = dot(incidence, vec3(0.0, 1.0, 0.0));
+	float fresnel = dot(incidence, o_normals);
 	vec3 reflection = reflect(incidence, normalize(o_normals));
 	vec3 refraction = refract(incidence, normalize(o_normals), value);
 
@@ -35,5 +35,9 @@ void main(){
 	vec4 reflectcolor = vec4(texture(skybox, reflection).rgb, 1.0);
 	vec4 refractcolor = mix(wallcolor, vec4(texture(skybox, refraction).rgb, 1.0), 0.5);
 		
-	color = mix(mix(reflectcolor, refractcolor, fresnel), vec4(0.0, 0.5, 0.5, 1.0), 0.6);
+	//color = mix(mix(reflectcolor, refractcolor, fresnel), vec4(0.0, 0.5, 0.5, 0.6), 0.6);
+	color = mix(reflectcolor, refractcolor, fresnel);
+	//color = vec4(texture(skybox, transparency).rgb, 1.0);
+
+
 }

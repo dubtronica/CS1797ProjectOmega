@@ -432,6 +432,21 @@ int main() {
 		u_style = glGetUniformLocation(sphereprogram, "style");
 	}
 
+	GLuint transprogram = loadProgram("shaders/refract.vsh", "shaders/refract.fsh");
+
+	GLuint t_model, t_view, t_proj, t_eyepos, t_cube, t_time, t_style, t_pooltex;
+	{
+		t_model = glGetUniformLocation(transprogram, "model");
+		t_view = glGetUniformLocation(transprogram, "view");
+		t_proj = glGetUniformLocation(transprogram, "proj");
+		t_eyepos = glGetUniformLocation(transprogram, "eye_pos");
+		t_cube = glGetUniformLocation(transprogram, "skybox");
+		t_time = glGetUniformLocation(transprogram, "time");
+		t_style = glGetUniformLocation(transprogram, "style");
+		t_pooltex = glGetUniformLocation(transprogram, "pooltex");
+	}
+
+
 	//blur program
 	GLuint frameprogram = loadProgram("shaders/frame.vsh", "shaders/frame.fsh");
 	auto f_frametex = glGetUniformLocation(frameprogram, "frametex"); //source texture for blurring
@@ -511,6 +526,7 @@ int main() {
 
 			// water plane
 			{
+				glFrontFace(GL_CCW);
 				glm::mat4 model = glm::mat4(1.f);
 				// model = glm::scale(model, glm::vec3(1.f, 0.8f, 1.f));
 				// model = glm::rotate(model, 90.f * PI / 180.f, glm::vec3(1.f, 0.f, 0.f));
@@ -529,6 +545,7 @@ int main() {
 				glBindVertexArray(newPlaneVAO);
 				glDrawArrays(GL_TRIANGLE_STRIP, 0, newPlane.size());
 			}
+
 
 			// pool
 			{
