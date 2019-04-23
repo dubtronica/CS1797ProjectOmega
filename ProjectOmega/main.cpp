@@ -33,7 +33,7 @@ mouse_lastY = SCR_HEIGHT / 2.f,		// to keep track of mouse position
 yaw = -90.f,						// camera yaw 
 pitch = 0;	// camera pitch
 
-int selection = 1;
+int selection = 1, style = 0;
 
 bool
 firstMouse = true, refMode = true;			// fixing the mouse location upon startup (check camera slides)                    // input management (so the key is not repeated until released)
@@ -492,7 +492,7 @@ int main() {
 				glUniformMatrix4fv(u_proj, 1, GL_FALSE, glm::value_ptr(proj));
 				glUniform3fv(u_eyepos, 1, (GLfloat*)& cameraPos);
 				glUniform1i(u_pooltex, 7);
-				glUniform1i(u_style, 1);
+				glUniform1i(u_style, style);
 				
 				glUniform1f(u_time, glfwGetTime());
 
@@ -600,6 +600,12 @@ void processInput(GLFWwindow *window) {
 		selection = 3;
 	if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS)
 		selection = 4;
+	if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
+		style = 0;
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+		style = 1;
+	if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
+		style = 2;
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		exit(0);
 }
