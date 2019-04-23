@@ -371,6 +371,23 @@ int main() {
 		}
 	}
 
+	// generate framebuffer to store area under the pool
+	GLuint refractFbo;
+	glGenFramebuffers(1, &refractFbo);
+
+	// generate refraction texture
+	GLuint refractTex;
+	{
+		glGenTextures(1, &refractTex);
+		glActiveTexture(GL_TEXTURE8);
+		glBindTexture(GL_TEXTURE_2D, refractTex);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, SCR_WIDTH, SCR_HEIGHT, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	}
+
 	///loading programs 
 
 	//skybox
@@ -404,6 +421,9 @@ int main() {
 		u_style = glGetUniformLocation(sphereprogram, "style");
 	}
 
+	glUseProgram(sphereprogram);
+	glUniform1f(u_pooltex, 7);
+
 	//blur program
 	GLuint frameprogram = loadProgram("shaders/frame.vsh", "shaders/frame.fsh");
 	auto f_frametex = glGetUniformLocation(frameprogram, "frametex"); //source texture for blurring
@@ -423,25 +443,31 @@ int main() {
 	}
 
 	glUseProgram(combineprogram);
-
-	GLuint poolprogram = loadProgram("shaders/plain.vsh", "shaders/plain.fsh");
-	GLuint p_model, p_view, p_proj;
-	{
-		p_model = glGetUniformLocation(poolprogram, "model");
-		p_view = glGetUniformLocation(poolprogram, "view");
-		p_proj = glGetUniformLocation(poolprogram, "projection");
-	}
-
+	
 	// set up Uniform1i's
 	glUniform1i(c_pristineTex, 3);
 	glUniform1i(c_blurTex, 4);
 	glUniform1i(c_depthTex, 5);
+
+	GLuint poolprogram = loadProgram("shaders/plain.vsh", "shaders/plain.fsh");
+	GLuint p_model, p_view, p_proj, p_pool_tex;
+	{
+		p_model = glGetUniformLocation(poolprogram, "model");
+		p_view = glGetUniformLocation(poolprogram, "view");
+		p_proj = glGetUniformLocation(poolprogram, "projection");
+		p_pool_tex = glGetUniformLocation(poolprogram, "poolTexture");
+	}
 	
+	glUseProgram(poolprogram);
+	glUniform1i(p_pool_tex, 7);
+
 	/// render loop
 	while (!glfwWindowShouldClose(window)) {
 		processInput(window);
 
-		//std::cout << selection << std::endl;
+		// render the pool and skybox to a framebuffer bound to a refractTex
+		// render the pool, water and skybox to a framebuffer bound to a pristinetex
+		// combine
 
 		//bind pristineFbo and render
 		{
@@ -470,8 +496,6 @@ int main() {
 				
 				glUniform1f(u_time, glfwGetTime());
 
-				glActiveTexture(GL_TEXTURE0);
-				glBindTexture(GL_TEXTURE_2D, pooltex);
 				glBindTexture(GL_TEXTURE_CUBE_MAP, sbox);
 				glBindVertexArray(planeTexVAO);
 				glDrawArrays(GL_TRIANGLE_STRIP, 0, planeTex.size());
@@ -486,8 +510,6 @@ int main() {
 				glUniformMatrix4fv(p_view, 1, GL_FALSE, glm::value_ptr(view));
 				glUniformMatrix4fv(p_proj, 1, GL_FALSE, glm::value_ptr(proj));
 
-				glActiveTexture(GL_TEXTURE0);
-				glBindTexture(GL_TEXTURE_2D, pooltex);
 				glBindVertexArray(cubeTexVAO);
 				glDrawArrays(GL_TRIANGLE_STRIP, 0, texcube.size());
 				glFrontFace(GL_CCW);
