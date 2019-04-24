@@ -419,7 +419,7 @@ int main() {
 	//render programs
 	GLuint sphereprogram = loadProgram("shaders/reflect.vsh", "shaders/reflect.gsh", "shaders/reflect.fsh");
 
-	GLuint u_cube, u_model, u_view, u_proj, u_eyepos, u_lightpos, u_lightcolor, u_dudv, u_pooltex, u_time, u_style;
+	GLuint u_cube, u_model, u_view, u_proj, u_eyepos, u_lightpos, u_lightcolor, u_dudv, u_pooltex, u_poolnorm, u_time, u_style;
 	{
 		u_cube = glGetUniformLocation(sphereprogram, "skybox");
 		u_model = glGetUniformLocation(sphereprogram, "model");
@@ -430,9 +430,13 @@ int main() {
 		u_lightcolor = glGetUniformLocation(sphereprogram, "lightcolor");
 		u_dudv = glGetUniformLocation(sphereprogram, "dudv");
 		u_pooltex = glGetUniformLocation(sphereprogram, "pooltex");
+		u_poolnorm = glGetUniformLocation(sphereprogram, "poolnorm");
 		u_time = glGetUniformLocation(sphereprogram, "time");
 		u_style = glGetUniformLocation(sphereprogram, "style");
 	}
+
+	GLuint poolNorm; 
+	loadTexture(&poolNorm, 9, "textures/normal.jpg");
 
 	GLuint transprogram = loadProgram("shaders/refract.vsh", "shaders/refract.fsh");
 
@@ -531,7 +535,7 @@ int main() {
 
 			// water plane
 			{
-				//glDisable(GL_CULL_FACE);
+				glDisable(GL_CULL_FACE);
 				glm::mat4 model = glm::mat4(1.f);
 				// model = glm::scale(model, glm::vec3(1.f, 0.8f, 1.f));
 				// model = glm::rotate(model, 90.f * PI / 180.f, glm::vec3(1.f, 0.f, 0.f));
@@ -552,7 +556,7 @@ int main() {
 				glBindTexture(GL_TEXTURE_CUBE_MAP, sbox);
 				glBindVertexArray(newPlaneVAO);
 				glDrawArrays(GL_TRIANGLE_STRIP, 0, newPlane.size());
-				//glEnable(GL_CULL_FACE);
+				glEnable(GL_CULL_FACE);
 			}
 
 			// pool

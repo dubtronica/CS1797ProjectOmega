@@ -9,6 +9,7 @@ in vec4 clipSpace;
 uniform vec3 eye_pos, lightpos, lightcolor;
 uniform samplerCube skybox;
 uniform sampler2D dudv;
+uniform sampler2D poolnorm;
 uniform sampler2D pooltex;
 
 void main(){
@@ -37,8 +38,9 @@ void main(){
 	vec4 wallcolor = texture(pooltex, ndc);
 
 	vec4 reflectcolor = vec4(texture(skybox, reflection).rgb, 1.0);
-	vec4 refractcolor = mix(wallcolor, vec4(texture(skybox, refraction).rgb, 1.0), 0.45);
-		
+	vec4 refractcolor = mix(wallcolor, vec4(texture(skybox, refraction).rgb, 1.0), 0.5);
+	
 	color = mix(mix(reflectcolor, refractcolor, fresnel), vec4(0.0, 0.5, 0.5, 1.0), 0.6);
 
+	//color = mix(reflectcolor, refractcolor, fresnel) + vec4(highlights, 0.0);
 }
