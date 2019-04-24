@@ -33,14 +33,14 @@ void main(){
 	vec3 reflectlight = reflect(normalize(lightpos - o_pos), normalize(o_normals));
 	float specular = max( dot(reflectlight, incidence), 0.0);
 	specular = pow(specular, 20.0);
-	vec3 highlights = lightcolor * specular * 0.2;
+	vec3 highlights = lightcolor * specular * 0.4;
 
 	vec4 wallcolor = texture(pooltex, ndc);
 
 	vec4 reflectcolor = vec4(texture(skybox, reflection).rgb, 1.0);
-	vec4 refractcolor = mix(wallcolor, vec4(texture(skybox, refraction).rgb, 1.0), 0.5);
+	vec4 refractcolor = mix(wallcolor, vec4(texture(skybox, refraction).rgb, 1.0), 0.3);
 	
-	color = mix(mix(reflectcolor, refractcolor, fresnel), vec4(0.0, 0.5, 0.5, 1.0), 0.6);
+	color = mix(mix(reflectcolor, refractcolor, fresnel), vec4(0.0, 1.0, 1.0, 0.5), 0.5) + vec4(highlights, 0.0);
 
 	//color = mix(reflectcolor, refractcolor, fresnel) + vec4(highlights, 0.0);
 }

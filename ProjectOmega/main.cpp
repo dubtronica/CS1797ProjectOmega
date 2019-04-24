@@ -406,6 +406,9 @@ int main() {
 
 	GLuint pooltex;
 	loadTexture(&pooltex, 7, "textures/bathroom_tiles.jpg");
+
+	GLuint caustex;
+	loadTexture(&caustex, 9, "textures/caustics.png");
 	
 	//SB program
 	auto skyboxprogram = loadProgram("shaders/skybox.vsh", "shaders/skybox.fsh");
@@ -434,9 +437,6 @@ int main() {
 		u_time = glGetUniformLocation(sphereprogram, "time");
 		u_style = glGetUniformLocation(sphereprogram, "style");
 	}
-
-	GLuint poolNorm; 
-	loadTexture(&poolNorm, 9, "textures/normal.jpg");
 
 	GLuint transprogram = loadProgram("shaders/refract.vsh", "shaders/refract.fsh");
 
@@ -479,17 +479,19 @@ int main() {
 	glUniform1i(c_depthTex, 5);
 
 	GLuint poolprogram = loadProgram("shaders/plain.vsh", "shaders/plain.fsh");
-	GLuint p_model, p_view, p_proj, p_pool_tex, p_clipping_plane;
+	GLuint p_model, p_view, p_proj, p_pool_tex, p_clipping_plane, p_caustic;
 	{
 		p_model = glGetUniformLocation(poolprogram, "model");
 		p_view = glGetUniformLocation(poolprogram, "view");
 		p_proj = glGetUniformLocation(poolprogram, "projection");
 		p_pool_tex = glGetUniformLocation(poolprogram, "poolTexture");
 		p_clipping_plane = glGetUniformLocation(poolprogram, "clipping_plane");
+		p_caustic = glGetUniformLocation(poolprogram, "causticTexture");
 	}
 	
 	glUseProgram(poolprogram);
 	glUniform1i(p_pool_tex, 7);
+	glUniform1i(p_caustic, 9);
 
 	glm::vec3 lightpos(-0.3, 0.7, -0.2);
 	glm::vec3 lightcol(1, 1, 1);
