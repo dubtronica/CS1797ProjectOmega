@@ -407,8 +407,12 @@ int main() {
 	GLuint pooltex;
 	loadTexture(&pooltex, 7, "textures/bathroom_tiles.jpg");
 
-	GLuint caustex;
-	loadTexture(&caustex, 9, "textures/caustics.png");
+	GLuint caust1, caust2, caust3, caust4, caust5;
+	loadTexture(&caust1, 9, "textures/caust_001.png");
+	loadTexture(&caust2, 10, "textures/caust_002.png");
+	loadTexture(&caust3, 11, "textures/caust_003.png");
+	loadTexture(&caust4, 12, "textures/caust_004.png");
+	loadTexture(&caust5, 13, "textures/caust_005.png");
 	
 	//SB program
 	auto skyboxprogram = loadProgram("shaders/skybox.vsh", "shaders/skybox.fsh");
@@ -479,22 +483,34 @@ int main() {
 	glUniform1i(c_depthTex, 5);
 
 	GLuint poolprogram = loadProgram("shaders/plain.vsh", "shaders/plain.fsh");
-	GLuint p_model, p_view, p_proj, p_pool_tex, p_clipping_plane, p_caustic;
+	GLuint p_model, p_view, p_proj, p_pool_tex, p_clipping_plane, p_time, p_caust1, p_caust2, p_caust3, p_caust4, p_caust5;
 	{
 		p_model = glGetUniformLocation(poolprogram, "model");
 		p_view = glGetUniformLocation(poolprogram, "view");
 		p_proj = glGetUniformLocation(poolprogram, "projection");
 		p_pool_tex = glGetUniformLocation(poolprogram, "poolTexture");
 		p_clipping_plane = glGetUniformLocation(poolprogram, "clipping_plane");
-		p_caustic = glGetUniformLocation(poolprogram, "causticTexture");
+		p_time = glGetUniformLocation(poolprogram, "time");
+
+		p_caust1 = glGetUniformLocation(poolprogram, "caustics[0]");
+		p_caust2 = glGetUniformLocation(poolprogram, "caustics[1]");
+		p_caust3 = glGetUniformLocation(poolprogram, "caustics[2]");
+		p_caust4 = glGetUniformLocation(poolprogram, "caustics[3]");
+		p_caust5 = glGetUniformLocation(poolprogram, "caustics[4]");
 	}
 	
 	glUseProgram(poolprogram);
 	glUniform1i(p_pool_tex, 7);
-	glUniform1i(p_caustic, 9);
+	glUniform1i(p_caust1, 9);
+	glUniform1i(p_caust2, 10);
+	glUniform1i(p_caust3, 11);
+	glUniform1i(p_caust4, 12);
+	glUniform1i(p_caust5, 13);
 
 	glm::vec3 lightpos(-0.3, 0.7, -0.2);
 	glm::vec3 lightcol(1, 1, 1);
+
+	int t = 0;
 
 	/// render loop
 	while (!glfwWindowShouldClose(window)) {
@@ -521,6 +537,7 @@ int main() {
 				glUniformMatrix4fv(p_view, 1, GL_FALSE, glm::value_ptr(view));
 				glUniformMatrix4fv(p_proj, 1, GL_FALSE, glm::value_ptr(proj));
 				glUniform4fv(p_clipping_plane, 1, glm::value_ptr(glm::vec4(0, -1, 0, .2)));
+				glUniform1i(p_time, t);
 
 				glBindVertexArray(cubeTexVAO);
 				glDrawArrays(GL_TRIANGLE_STRIP, 0, texcube.size());
@@ -570,6 +587,7 @@ int main() {
 				glUniformMatrix4fv(p_view, 1, GL_FALSE, glm::value_ptr(view));
 				glUniformMatrix4fv(p_proj, 1, GL_FALSE, glm::value_ptr(proj));
 				glUniform4fv(p_clipping_plane, 1, glm::value_ptr(glm::vec4(0, 0, 0, 0)));
+				glUniform1i(p_time, t);
 
 				glBindVertexArray(cubeTexVAO);
 				glDrawArrays(GL_TRIANGLE_STRIP, 0, texcube.size());
@@ -643,6 +661,26 @@ int main() {
 		GLfloat currentTime = glfwGetTime();
 		deltaTime = currentTime - lastFrame;
 		lastFrame = currentTime;
+
+		float plan = glfwGetTime() - floor(glfwGetTime());
+
+		cout << plan << endl;
+
+		//for texture timing
+		if (plan < 0.2) {
+			t = 0;
+		} else if (plan < 0.4) {
+			t = 1;
+		}
+		else if (plan < 0.6) {
+			t = 2;
+		}
+		else if (plan < 0.8) {
+			t = 3;
+		}
+		else if(plan < 1.0) {
+			t = 4;
+		}
 	}
 
 	// glfw: terminate, clearing all previously allocated GLFW resources.

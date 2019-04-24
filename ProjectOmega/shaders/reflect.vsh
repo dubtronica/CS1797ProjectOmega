@@ -21,7 +21,7 @@ void main() {
 	}
 	else if (style % 3 == 1)
 	{
-		temp_pos.y += sin(temp_pos.x * 100 + time * 10) / 50;
+		temp_pos.y -= sin(temp_pos.x * 100 + time * 10) / 50;
 	}
 	else
 	{

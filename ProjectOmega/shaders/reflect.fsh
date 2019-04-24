@@ -26,8 +26,8 @@ void main(){
 
 	vec3 transparency = refract(incidence, normalize(o_normals), transparent);
 
-	if(fresnel < 0.15){
-		fresnel = 0.15;
+	if(fresnel < 0.35){
+		fresnel = 0.35;
 	} 
 
 	vec3 reflectlight = reflect(normalize(lightpos - o_pos), normalize(o_normals));
@@ -40,7 +40,7 @@ void main(){
 	vec4 reflectcolor = vec4(texture(skybox, reflection).rgb, 1.0);
 	vec4 refractcolor = mix(wallcolor, vec4(texture(skybox, refraction).rgb, 1.0), 0.3);
 	
-	color = mix(mix(reflectcolor, refractcolor, fresnel), vec4(0.0, 1.0, 1.0, 0.5), 0.5) + vec4(highlights, 0.0);
+	color = mix(mix(reflectcolor, refractcolor, fresnel), vec4(0.0, 1.0, 1.0, 0.0), 0.5) + vec4(highlights, 0.0);
 
 	//color = mix(reflectcolor, refractcolor, fresnel) + vec4(highlights, 0.0);
 }
