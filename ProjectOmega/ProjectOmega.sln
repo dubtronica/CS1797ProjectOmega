@@ -13,6 +13,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "shaders", "shaders", "{DE0B
 		shaders\plain.fsh = shaders\plain.fsh
 		shaders\plain.vsh = shaders\plain.vsh
 		shaders\reflect.fsh = shaders\reflect.fsh
+		shaders\reflect.gsh = shaders\reflect.gsh
 		shaders\reflect.vsh = shaders\reflect.vsh
 		shaders\refract.fsh = shaders\refract.fsh
 		shaders\refract.vsh = shaders\refract.vsh

@@ -19,7 +19,7 @@ void main(){
 	float value = 1.000 / 1.333;
 	float transparent = 1.000 / 1.000;
 
-	float fresnel = dot(incidence, vec3(0.0, 1.0, 0.0));
+	float fresnel = dot(incidence, o_normals);
 	vec3 reflection = reflect(incidence, normalize(o_normals));
 	vec3 refraction = refract(incidence, normalize(o_normals), value);
 
@@ -29,15 +29,16 @@ void main(){
 		fresnel = 0.15;
 	} 
 
-	vec3 reflectlight = reflect(normalize(lightpos - o_pos), o_normals);
+	vec3 reflectlight = reflect(normalize(lightpos - o_pos), normalize(o_normals));
 	float specular = max( dot(reflectlight, incidence), 0.0);
 	specular = pow(specular, 20.0);
-	vec3 highlights = lightcolor * specular * 0.6;
+	vec3 highlights = lightcolor * specular * 0.2;
 
 	vec4 wallcolor = texture(pooltex, ndc);
 
 	vec4 reflectcolor = vec4(texture(skybox, reflection).rgb, 1.0);
-	vec4 refractcolor = mix(wallcolor, vec4(texture(skybox, refraction).rgb, 1.0), 0.5);
+	vec4 refractcolor = mix(wallcolor, vec4(texture(skybox, refraction).rgb, 1.0), 0.45);
 		
-	color = mix(mix(reflectcolor, refractcolor, fresnel), vec4(0.0, 0.5, 0.5, 1.0), 0.6) + vec4(highlights, 0.0);
+	color = mix(mix(reflectcolor, refractcolor, fresnel), vec4(0.0, 0.5, 0.5, 1.0), 0.6);
+
 }

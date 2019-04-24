@@ -31,13 +31,14 @@ void main(){
 	} 
 
 	vec4 wallcolor = texture(pooltex, ndc);
+	vec3 wall = wallcolor.rgb;
 
 	vec4 reflectcolor = vec4(texture(skybox, reflection).rgb, 1.0);
 	vec4 refractcolor = mix(wallcolor, vec4(texture(skybox, refraction).rgb, 1.0), 0.5);
 		
 	//color = mix(mix(reflectcolor, refractcolor, fresnel), vec4(0.0, 0.5, 0.5, 0.6), 0.6);
-	color = mix(reflectcolor, refractcolor, fresnel);
-	//color = vec4(texture(skybox, transparency).rgb, 1.0);
+	//color = mix(reflectcolor, refractcolor, fresnel);
+	color = vec4(texture(skybox, transparency).rgb, 1.0);
 
 
 }

@@ -531,7 +531,7 @@ int main() {
 
 			// water plane
 			{
-				glFrontFace(GL_CCW);
+				//glDisable(GL_CULL_FACE);
 				glm::mat4 model = glm::mat4(1.f);
 				// model = glm::scale(model, glm::vec3(1.f, 0.8f, 1.f));
 				// model = glm::rotate(model, 90.f * PI / 180.f, glm::vec3(1.f, 0.f, 0.f));
@@ -540,7 +540,7 @@ int main() {
 				glUniformMatrix4fv(u_view, 1, GL_FALSE, glm::value_ptr(view));
 				glUniformMatrix4fv(u_proj, 1, GL_FALSE, glm::value_ptr(proj));
 				glUniform3fv(u_eyepos, 1, (GLfloat*)& cameraPos);
-				glUniform3fv(u_lightpos, 1, (GLfloat*)& lightpos);
+				glUniform3fv(u_lightpos, 1, (GLfloat*)& cameraPos);
 				glUniform3fv(u_lightcolor, 1, (GLfloat*)& lightcol);
 				
 
@@ -552,8 +552,8 @@ int main() {
 				glBindTexture(GL_TEXTURE_CUBE_MAP, sbox);
 				glBindVertexArray(newPlaneVAO);
 				glDrawArrays(GL_TRIANGLE_STRIP, 0, newPlane.size());
+				//glEnable(GL_CULL_FACE);
 			}
-
 
 			// pool
 			{
